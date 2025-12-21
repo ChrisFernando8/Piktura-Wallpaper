@@ -10,7 +10,7 @@ class WallpaperActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wallpaper) // nome do layout XML
 
-        val imageView = findViewById<ImageView>(R.id.wallpaperImageView)
+        val imageView = findViewById<ImageView>(R.id.wallpaperImage)
 
         // Recebendo o recurso da intent
         val wallpaperResId = intent.getIntExtra("wallpaperResId", 0)
