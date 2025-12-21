@@ -3,10 +3,44 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Imagem de fundo -->
     <ImageView
         android:id="@+id/wallpaperImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitCenter"
         android:contentDescription="Wallpaper" />
+
+    <!-- Container para os botões -->
+    <LinearLayout
+        android:id="@+id/buttonContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="bottom|center_horizontal"
+        android:padding="16dp"
+        android:gravity="center"
+        android:background="@android:color/transparent">
+
+        <Button
+            android:id="@+id/btnHome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Home Screen" />
+
+        <Button
+            android:id="@+id/btnLock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lock Screen"
+            android:layout_marginTop="8dp"/>
+
+        <Button
+            android:id="@+id/btnBoth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Both"
+            android:layout_marginTop="8dp"/>
+    </LinearLayout>
+
 </FrameLayout>
