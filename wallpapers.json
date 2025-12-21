@@ -1,4 +1,7 @@
-
+{
+  "wallpapers": [
+    {
+      
 "id": 1,
 "url":https://i.postimg.cc/rm9JvdVy/wp1.jpg
 "category": "Nature"
@@ -10,4 +13,6 @@
 "id": 3,
 "url":https://i.postimg.cc/bJRTKGyw/wp3.jpg
 "category": "Abstract"
-
+  }
+  ]
+}
