@@ -8,10 +8,14 @@ class WallpaperActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_wallpaper)
+        setContentView(R.layout.activity_wallpaper) // nome do layout XML
 
-        val imageRes = intent.getIntExtra("imageRes", 0)
         val imageView = findViewById<ImageView>(R.id.wallpaperImageView)
-        imageView.setImageResource(imageRes)
+
+        // Recebendo o recurso da intent
+        val wallpaperResId = intent.getIntExtra("wallpaperResId", 0)
+        if (wallpaperResId != 0) {
+            imageView.setImageResource(wallpaperResId)
+        }
     }
 }
