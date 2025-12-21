@@ -1,24 +1,14 @@
-# Android
+# Gradle
 .gradle/
 build/
-captures/
-.externalNativeBuild/
-.cxx/
-.local.properties
+
+# Android
+app/build/
+local.properties
+
+# IntelliJ / Android Studio
 .idea/
 *.iml
-*.hprof
+
+# Logs
 *.log
-
-# Kotlin
-*.kotlin_module
-
-# Android Studio
-.DS_Store
-*.apk
-*.ap_
-*.aab
-
-# Jetpack Compose previews
-.navigation/
-out/
