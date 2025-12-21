@@ -11,15 +11,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val recycler = findViewById<RecyclerView>(R.id.recyclerView)
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
 
         val wallpapers = listOf(
-            R.drawable.wp1,
-            R.drawable.wp2,
-            R.drawable.wp3
+            "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+            "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
+            "https://images.unsplash.com/photo-1470770841072-f978cf4d019e"
         )
 
-        recycler.layoutManager = GridLayoutManager(this, 2)
-        recycler.adapter = WallpaperAdapter(this, wallpapers)
+        recyclerView.layoutManager = GridLayoutManager(this, 2)
+        recyclerView.adapter = WallpaperAdapter(this, wallpapers)
     }
 }
