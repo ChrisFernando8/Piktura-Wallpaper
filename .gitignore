@@ -2,13 +2,15 @@
 .gradle/
 build/
 
-# Android
-app/build/
+# Local Android SDK
 local.properties
 
-# IntelliJ / Android Studio
+# IDEs
 .idea/
 *.iml
+
+# OS
+.DS_Store
 
 # Logs
 *.log
