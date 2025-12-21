@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/black">
+    android:layout_height="match_parent">
 
-    <!-- Imagem do wallpaper -->
+    <!-- Wallpaper em tela cheia SEM distorcer -->
     <ImageView
         android:id="@+id/wallpaperImage"
         android:layout_width="match_parent"
@@ -13,16 +12,13 @@
         android:adjustViewBounds="true"
         android:contentDescription="Wallpaper" />
 
-    <!-- Fundo escuro translúcido para os botões -->
+    <!-- Botões flutuantes -->
     <LinearLayout
-        android:id="@+id/buttonContainer"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
         android:orientation="horizontal"
-        android:padding="12dp"
-        android:gravity="center"
-        android:background="#66000000">
+        android:layout_gravity="bottom|center_horizontal"
+        android:padding="16dp">
 
         <Button
             android:id="@+id/btnHome"
@@ -35,14 +31,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Lock"
-            android:layout_marginStart="12dp"/>
+            android:layout_marginStart="8dp" />
 
         <Button
             android:id="@+id/btnBoth"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Both"
-            android:layout_marginStart="12dp"/>
+            android:layout_marginStart="8dp" />
     </LinearLayout>
 
 </FrameLayout>
