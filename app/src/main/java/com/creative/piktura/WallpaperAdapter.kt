@@ -11,8 +11,12 @@ import com.bumptech.glide.Glide
 
 class WallpaperAdapter(
     private val context: Context,
-    private val wallpapers: List<String>
+    private val wallpapers: List<WallpaperItem>
 ) : RecyclerView.Adapter<WallpaperAdapter.ViewHolder>() {
+
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val image: ImageView = view.findViewById(R.id.imgWallpaper)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(context)
@@ -21,23 +25,19 @@ class WallpaperAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val url = wallpapers[position]
+        val item = wallpapers[position]
 
         Glide.with(context)
-            .load(url)
+            .load(item.url)
             .centerCrop()
             .into(holder.image)
 
         holder.image.setOnClickListener {
             val intent = Intent(context, WallpaperActivity::class.java)
-            intent.putExtra("wallpaperUrl", url)
+            intent.putExtra("imageUrl", item.url)
             context.startActivity(intent)
         }
     }
 
-    override fun getItemCount(): Int = wallpapers.size
-
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val image: ImageView = view.findViewById(R.id.imgWallpaper)
-    }
+    override fun getItemCount() = wallpapers.size
 }
