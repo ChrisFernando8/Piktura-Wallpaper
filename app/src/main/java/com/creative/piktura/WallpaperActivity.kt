@@ -1,7 +1,6 @@
 package com.creative.piktura
 
 import android.app.WallpaperManager
-import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
@@ -10,6 +9,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import android.content.res.Resources
 import java.io.IOException
 
 class WallpaperActivity : AppCompatActivity() {
@@ -18,26 +18,32 @@ class WallpaperActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wallpaper)
 
-        // Views
         val wallpaperImageView = findViewById<ImageView>(R.id.wallpaperImage)
         val btnHome = findViewById<Button>(R.id.btnHome)
         val btnLock = findViewById<Button>(R.id.btnLock)
         val btnBoth = findViewById<Button>(R.id.btnBoth)
 
-        // Recebe a imagem enviada pelo adapter
+        // Recebe o recurso da imagem enviado pelo adapter
         val wallpaperRes = intent.getIntExtra("wallpaperRes", -1)
         if (wallpaperRes != -1) {
             wallpaperImageView.setImageResource(wallpaperRes)
         }
 
-        // Função para aplicar wallpaper
+        // Função para aplicar wallpaper mantendo proporção
         fun setWallpaper(target: String) {
             val wallpaperManager = WallpaperManager.getInstance(this)
 
-            // Redimensiona a imagem para o tamanho da tela
+            val bitmap = BitmapFactory.decodeResource(resources, wallpaperRes)
+
+            // Redimensiona proporcionalmente para caber na tela
             val metrics = Resources.getSystem().displayMetrics
-            val bitmap: Bitmap = BitmapFactory.decodeResource(resources, wallpaperRes)
-            val scaledBitmap = Bitmap.createScaledBitmap(bitmap, metrics.widthPixels, metrics.heightPixels, true)
+            val scale = Math.min(
+                metrics.widthPixels.toFloat() / bitmap.width,
+                metrics.heightPixels.toFloat() / bitmap.height
+            )
+            val scaledWidth = (bitmap.width * scale).toInt()
+            val scaledHeight = (bitmap.height * scale).toInt()
+            val scaledBitmap = Bitmap.createScaledBitmap(bitmap, scaledWidth, scaledHeight, true)
 
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
