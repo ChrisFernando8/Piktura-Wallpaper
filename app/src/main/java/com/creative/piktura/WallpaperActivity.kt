@@ -1,5 +1,7 @@
 package com.creative.piktura
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.app.WallpaperManager
 import android.graphics.BitmapFactory
 import android.os.Build
