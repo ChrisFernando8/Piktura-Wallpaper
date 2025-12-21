@@ -20,12 +20,11 @@ class WallpaperAdapter(
 
     override fun onBindViewHolder(holder: WallpaperViewHolder, position: Int) {
         val wallpaperRes = wallpapers[position]
-        holder.imageView.setImageResource(wallpaperRes)
+        holder.image.setImageResource(wallpaperRes)
 
-        // Clique para abrir WallpaperActivity
-        holder.itemView.setOnClickListener {
+        holder.image.setOnClickListener {
             val intent = Intent(context, WallpaperActivity::class.java)
-            intent.putExtra("wallpaperResId", wallpaperRes)
+            intent.putExtra("wallpaperRes", wallpaperRes)
             context.startActivity(intent)
         }
     }
@@ -33,6 +32,6 @@ class WallpaperAdapter(
     override fun getItemCount(): Int = wallpapers.size
 
     class WallpaperViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imageView: ImageView = itemView.findViewById(R.id.wallpaperImage)
+        val image: ImageView = itemView.findViewById(R.id.imgWallpaper)
     }
 }
