@@ -1,7 +1,6 @@
 package com.creative.piktura
 
 import android.app.WallpaperManager
-import android.content.res.Resources
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
@@ -16,12 +15,13 @@ class WallpaperActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wallpaper)
 
+        // Views
         val wallpaperImageView = findViewById<ImageView>(R.id.wallpaperImage)
         val btnHome = findViewById<Button>(R.id.btnHome)
         val btnLock = findViewById<Button>(R.id.btnLock)
         val btnBoth = findViewById<Button>(R.id.btnBoth)
 
-        // Recebe o recurso da imagem enviado pelo adapter
+        // Recebe o recurso da imagem enviado pelo Adapter
         val wallpaperRes = intent.getIntExtra("wallpaperRes", -1)
         if (wallpaperRes != -1) {
             wallpaperImageView.setImageResource(wallpaperRes)
@@ -32,46 +32,16 @@ class WallpaperActivity : AppCompatActivity() {
             Thread {
                 try {
                     val wallpaperManager = WallpaperManager.getInstance(this)
-
-                    // Reduz o bitmap carregado para tamanho da tela
-                    val metrics = Resources.getSystem().displayMetrics
-
-                    // Primeiro apenas lê dimensões
-                    val optionsBounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-                    BitmapFactory.decodeResource(resources, wallpaperRes, optionsBounds)
-
-                    var inSampleSize = 1
-                    val halfWidth = optionsBounds.outWidth / 2
-                    val halfHeight = optionsBounds.outHeight / 2
-                    while ((halfWidth / inSampleSize) >= metrics.widthPixels &&
-                           (halfHeight / inSampleSize) >= metrics.heightPixels) {
-                        inSampleSize *= 2
-                    }
-
-                    val decodeOptions = BitmapFactory.Options().apply { this.inSampleSize = inSampleSize }
-                    val bitmap = BitmapFactory.decodeResource(resources, wallpaperRes, decodeOptions)
-
-                    // Redimensiona para o tamanho exato da tela
-                    val scaledBitmap = android.graphics.Bitmap.createScaledBitmap(
-                        bitmap,
-                        metrics.widthPixels,
-                        metrics.heightPixels,
-                        true
-                    )
+                    val bitmap = BitmapFactory.decodeResource(resources, wallpaperRes)
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         when (target) {
-                            "home" -> wallpaperManager.setBitmap(scaledBitmap, null, true, WallpaperManager.FLAG_SYSTEM)
-                            "lock" -> wallpaperManager.setBitmap(scaledBitmap, null, true, WallpaperManager.FLAG_LOCK)
-                            "both" -> wallpaperManager.setBitmap(
-                                scaledBitmap,
-                                null,
-                                true,
-                                WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK
-                            )
+                            "home" -> wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_SYSTEM)
+                            "lock" -> wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK)
+                            "both" -> wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK)
                         }
                     } else {
-                        wallpaperManager.setBitmap(scaledBitmap)
+                        wallpaperManager.setBitmap(bitmap)
                     }
 
                     runOnUiThread {
@@ -87,7 +57,7 @@ class WallpaperActivity : AppCompatActivity() {
             }.start()
         }
 
-        // Botões chamando a função
+        // Clique dos botões
         btnHome.setOnClickListener { setWallpaper("home") }
         btnLock.setOnClickListener { setWallpaper("lock") }
         btnBoth.setOnClickListener { setWallpaper("both") }
