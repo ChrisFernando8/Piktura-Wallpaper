@@ -14,70 +14,45 @@ import java.io.IOException
 
 class WallpaperActivity : AppCompatActivity() {
 
-    private lateinit var wallpaperImageView: ImageView
-    private lateinit var btnHome: Button
-    private lateinit var btnLock: Button
-    private lateinit var btnBoth: Button
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wallpaper)
 
-        wallpaperImageView = findViewById(R.id.wallpaperImage)
-        btnHome = findViewById(R.id.btnSetHome)
-        btnLock = findViewById(R.id.btnSetLock)
-        btnBoth = findViewById(R.id.btnSetBoth)
+        // Views
+        val wallpaperImageView = findViewById<ImageView>(R.id.wallpaperImage)
+        val btnHome = findViewById<Button>(R.id.btnHome)
+        val btnLock = findViewById<Button>(R.id.btnLock)
+        val btnBoth = findViewById<Button>(R.id.btnBoth)
 
-        // Recebe o recurso da imagem enviado pelo adapter
+        // Recebe a imagem enviada pelo adapter
         val wallpaperRes = intent.getIntExtra("wallpaperRes", -1)
         if (wallpaperRes != -1) {
-            val bitmap = BitmapFactory.decodeResource(resources, wallpaperRes)
-            wallpaperImageView.setImageBitmap(bitmap)
-        } else {
-            Toast.makeText(this, "Erro ao carregar a imagem", Toast.LENGTH_SHORT).show()
-            finish()
-            return
+            wallpaperImageView.setImageResource(wallpaperRes)
         }
 
         // Função para aplicar wallpaper
         fun setWallpaper(target: String) {
             val wallpaperManager = WallpaperManager.getInstance(this)
 
+            // Redimensiona a imagem para o tamanho da tela
             val metrics = Resources.getSystem().displayMetrics
-            val bitmap = BitmapFactory.decodeResource(resources, wallpaperRes)
+            val bitmap: Bitmap = BitmapFactory.decodeResource(resources, wallpaperRes)
             val scaledBitmap = Bitmap.createScaledBitmap(bitmap, metrics.widthPixels, metrics.heightPixels, true)
 
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     when (target) {
                         "home" -> wallpaperManager.setBitmap(scaledBitmap, null, true, WallpaperManager.FLAG_SYSTEM)
-                        "lock" -> {
-                            try {
-                                wallpaperManager.setBitmap(scaledBitmap, null, true, WallpaperManager.FLAG_LOCK)
-                            } catch (e: Exception) {
-                                Toast.makeText(this, "Não foi possível aplicar na tela de bloqueio", Toast.LENGTH_SHORT).show()
-                                return
-                            }
-                        }
-                        "both" -> {
-                            try {
-                                wallpaperManager.setBitmap(scaledBitmap, null, true, WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK)
-                            } catch (e: Exception) {
-                                wallpaperManager.setBitmap(scaledBitmap, null, true, WallpaperManager.FLAG_SYSTEM)
-                                Toast.makeText(this, "Aplicado somente na tela inicial (lock screen não permitido)", Toast.LENGTH_SHORT).show()
-                                return
-                            }
-                        }
+                        "lock" -> wallpaperManager.setBitmap(scaledBitmap, null, true, WallpaperManager.FLAG_LOCK)
+                        "both" -> wallpaperManager.setBitmap(scaledBitmap, null, true, WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK)
                     }
                 } else {
+                    // Android < N não suporta lock screen, aplica na home
                     wallpaperManager.setBitmap(scaledBitmap)
-                    Toast.makeText(this, "Aplicado na tela inicial!", Toast.LENGTH_SHORT).show()
                 }
-
-                Toast.makeText(this, "Wallpaper aplicado!", Toast.LENGTH_SHORT).show()
-
+                Toast.makeText(this, "Wallpaper applied!", Toast.LENGTH_SHORT).show()
             } catch (e: IOException) {
-                Toast.makeText(this, "Erro ao definir wallpaper", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Error setting wallpaper", Toast.LENGTH_SHORT).show()
                 e.printStackTrace()
             }
         }
