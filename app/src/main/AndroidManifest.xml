@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.creative.piktura">
 
+    <!-- Permissões necessárias para definir wallpapers -->
+    <uses-permission android:name="android.permission.SET_WALLPAPER"/>
+    <uses-permission android:name="android.permission.SET_WALLPAPER_HINTS"/>
+
     <application
         android:label="Piktura"
         android:theme="@style/Theme.Material3.DayNight.NoActionBar">
@@ -18,5 +22,4 @@
         <activity android:name=".WallpaperActivity" />
 
     </application>
-
 </manifest>
