@@ -1,7 +1,7 @@
 package com.creative.piktura
 
 import android.app.WallpaperManager
-import android.graphics.Bitmap
+import android.content.res.Resources
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
@@ -9,8 +9,6 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import android.content.res.Resources
-import java.io.IOException
 
 class WallpaperActivity : AppCompatActivity() {
 
@@ -29,38 +27,64 @@ class WallpaperActivity : AppCompatActivity() {
             wallpaperImageView.setImageResource(wallpaperRes)
         }
 
-        // Função para aplicar wallpaper mantendo proporção
+        // Função para aplicar wallpaper em background
         fun setWallpaper(target: String) {
-            val wallpaperManager = WallpaperManager.getInstance(this)
+            Thread {
+                try {
+                    val wallpaperManager = WallpaperManager.getInstance(this)
 
-            val bitmap = BitmapFactory.decodeResource(resources, wallpaperRes)
+                    // Reduz o bitmap carregado para tamanho da tela
+                    val metrics = Resources.getSystem().displayMetrics
 
-            // Redimensiona proporcionalmente para caber na tela
-            val metrics = Resources.getSystem().displayMetrics
-            val scale = Math.min(
-                metrics.widthPixels.toFloat() / bitmap.width,
-                metrics.heightPixels.toFloat() / bitmap.height
-            )
-            val scaledWidth = (bitmap.width * scale).toInt()
-            val scaledHeight = (bitmap.height * scale).toInt()
-            val scaledBitmap = Bitmap.createScaledBitmap(bitmap, scaledWidth, scaledHeight, true)
+                    // Primeiro apenas lê dimensões
+                    val optionsBounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                    BitmapFactory.decodeResource(resources, wallpaperRes, optionsBounds)
 
-            try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    when (target) {
-                        "home" -> wallpaperManager.setBitmap(scaledBitmap, null, true, WallpaperManager.FLAG_SYSTEM)
-                        "lock" -> wallpaperManager.setBitmap(scaledBitmap, null, true, WallpaperManager.FLAG_LOCK)
-                        "both" -> wallpaperManager.setBitmap(scaledBitmap, null, true, WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK)
+                    var inSampleSize = 1
+                    val halfWidth = optionsBounds.outWidth / 2
+                    val halfHeight = optionsBounds.outHeight / 2
+                    while ((halfWidth / inSampleSize) >= metrics.widthPixels &&
+                           (halfHeight / inSampleSize) >= metrics.heightPixels) {
+                        inSampleSize *= 2
                     }
-                } else {
-                    // Android < N não suporta lock screen, aplica na home
-                    wallpaperManager.setBitmap(scaledBitmap)
+
+                    val decodeOptions = BitmapFactory.Options().apply { this.inSampleSize = inSampleSize }
+                    val bitmap = BitmapFactory.decodeResource(resources, wallpaperRes, decodeOptions)
+
+                    // Redimensiona para o tamanho exato da tela
+                    val scaledBitmap = android.graphics.Bitmap.createScaledBitmap(
+                        bitmap,
+                        metrics.widthPixels,
+                        metrics.heightPixels,
+                        true
+                    )
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        when (target) {
+                            "home" -> wallpaperManager.setBitmap(scaledBitmap, null, true, WallpaperManager.FLAG_SYSTEM)
+                            "lock" -> wallpaperManager.setBitmap(scaledBitmap, null, true, WallpaperManager.FLAG_LOCK)
+                            "both" -> wallpaperManager.setBitmap(
+                                scaledBitmap,
+                                null,
+                                true,
+                                WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK
+                            )
+                        }
+                    } else {
+                        wallpaperManager.setBitmap(scaledBitmap)
+                    }
+
+                    runOnUiThread {
+                        Toast.makeText(this, "Wallpaper applied!", Toast.LENGTH_SHORT).show()
+                    }
+
+                } catch (e: Exception) {
+                    runOnUiThread {
+                        Toast.makeText(this, "Error setting wallpaper", Toast.LENGTH_SHORT).show()
+                    }
+                    e.printStackTrace()
                 }
-                Toast.makeText(this, "Wallpaper applied!", Toast.LENGTH_SHORT).show()
-            } catch (e: IOException) {
-                Toast.makeText(this, "Error setting wallpaper", Toast.LENGTH_SHORT).show()
-                e.printStackTrace()
-            }
+            }.start()
         }
 
         // Botões chamando a função
