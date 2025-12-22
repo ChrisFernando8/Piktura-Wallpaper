@@ -1,6 +1,7 @@
 package com.creative.piktura
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +27,13 @@ class WallpaperAdapter(
             .load(url)
             .centerCrop()
             .into(holder.image)
+
+        // 👉 ABRIR PREVIEW AO CLICAR
+        holder.itemView.setOnClickListener {
+            val intent = Intent(context, WallpaperActivity::class.java)
+            intent.putExtra("image_url", url)
+            context.startActivity(intent)
+        }
     }
 
     override fun getItemCount(): Int = wallpapers.size
@@ -33,4 +41,4 @@ class WallpaperAdapter(
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val image: ImageView = itemView.findViewById(R.id.imgWallpaper)
     }
-}  
+}
