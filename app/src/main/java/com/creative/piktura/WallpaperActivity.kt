@@ -1,82 +1,43 @@
 package com.creative.piktura
 
-import android.app.WallpaperManager
-import android.graphics.Bitmap
-import android.os.Build
-import android.os.Bundle
-import android.widget.Button
+import android.content.Context
+import android.content.Intent
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 
-class WallpaperActivity : AppCompatActivity() {
+class WallpaperAdapter(
+    private val context: Context,
+    private val wallpapers: List<String>
+) : RecyclerView.Adapter<WallpaperAdapter.WallpaperViewHolder>() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_wallpaper)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WallpaperViewHolder {
+        val view = LayoutInflater.from(context)
+            .inflate(R.layout.item_wallpaper, parent, false)
+        return WallpaperViewHolder(view)
+    }
 
-        val imageView = findViewById<ImageView>(R.id.wallpaperImage)
-        val btnHome = findViewById<Button>(R.id.btnHome)
-        val btnLock = findViewById<Button>(R.id.btnLock)
-        val btnBoth = findViewById<Button>(R.id.btnBoth)
+    override fun onBindViewHolder(holder: WallpaperViewHolder, position: Int) {
+        val url = wallpapers[position]
 
-        val url = intent.getStringExtra("url") ?: return
-
-        Glide.with(this)
+        Glide.with(context)
             .load(url)
-            .fitCenter()
-            .into(imageView)
+            .centerCrop()
+            .into(holder.image)
 
-        fun applyWallpaper(flag: Int) {
-            val wallpaperManager = WallpaperManager.getInstance(this)
-
-            Glide.with(this)
-                .asBitmap()
-                .load(url)
-                .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(
-                        resource: Bitmap,
-                        transition: Transition<in Bitmap>?
-                    ) {
-                        try {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                wallpaperManager.setBitmap(resource, null, true, flag)
-                            } else {
-                                wallpaperManager.setBitmap(resource)
-                            }
-                            Toast.makeText(
-                                this@WallpaperActivity,
-                                "Wallpaper aplicado!",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } catch (e: Exception) {
-                            Toast.makeText(
-                                this@WallpaperActivity,
-                                "Erro ao aplicar wallpaper",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-
-                    override fun onLoadCleared(placeholder: Drawable?) {}
-                })
+        holder.image.setOnClickListener {
+            val intent = Intent(context, WallpaperActivity::class.java)
+            intent.putExtra("wallpaperUrl", url)
+            context.startActivity(intent)
         }
+    }
 
-        btnHome.setOnClickListener {
-            applyWallpaper(WallpaperManager.FLAG_SYSTEM)
-        }
+    override fun getItemCount(): Int = wallpapers.size
 
-        btnLock.setOnClickListener {
-            applyWallpaper(WallpaperManager.FLAG_LOCK)
-        }
-
-        btnBoth.setOnClickListener {
-            applyWallpaper(
-                WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK
-            )
-        }
+    class WallpaperViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val image: ImageView = itemView.findViewById(R.id.imgWallpaper)
     }
 }
