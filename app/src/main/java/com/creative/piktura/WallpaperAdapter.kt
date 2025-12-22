@@ -27,16 +27,14 @@ class WallpaperAdapter(
             .into(holder.image)
 
         holder.itemView.setOnClickListener {
-            val intent = Intent(
-                holder.itemView.context,
-                WallpaperActivity::class.java
-            )
+            val context = holder.itemView.context
+            val intent = Intent(context, WallpaperActivity::class.java)
             intent.putExtra("image_url", url)
-            holder.itemView.context.startActivity(intent)
+            context.startActivity(intent)
         }
     }
 
-    override fun getItemCount(): Int = wallpapers.size
+    override fun getItemCount() = wallpapers.size
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val image: ImageView = itemView.findViewById(R.id.imgWallpaper)
