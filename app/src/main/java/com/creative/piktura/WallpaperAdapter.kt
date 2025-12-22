@@ -15,7 +15,7 @@ class WallpaperAdapter(
 ) : RecyclerView.Adapter<WallpaperAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
+        val view = LayoutInflater.from(context)
             .inflate(R.layout.item_wallpaper, parent, false)
         return ViewHolder(view)
     }
