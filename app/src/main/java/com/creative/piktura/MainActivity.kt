@@ -15,9 +15,9 @@ class MainActivity : AppCompatActivity() {
 
         // 🔗 Lista de wallpapers por URL (Cloudinary)
         val wallpapers = listOf(
-            "https://raw.githubusercontent.com/ChrisFernando8/Imagens-piktura/refs/heads/main/Wallpapers/wp1.jpg",
-            "https://raw.githubusercontent.com/ChrisFernando8/Imagens-piktura/refs/heads/main/Wallpapers/wp2.jpg",
-            "https://raw.githubusercontent.com/ChrisFernando8/Imagens-piktura/refs/heads/main/Wallpapers/wp3.jpg"
+            "https://raw.githubusercontent.com/ChrisFernando8/Imagens-piktura/main/Wallpapers/wp1.jpg,
+            "https://raw.githubusercontent.com/ChrisFernando8/Imagens-piktura/main/Wallpapers/wp2.jpg,
+            "https://raw.githubusercontent.com/ChrisFernando8/Imagens-piktura/main/Wallpapers/wp3.jpg
         )
 
         recyclerView.layoutManager = GridLayoutManager(this, 2)
