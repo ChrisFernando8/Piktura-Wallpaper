@@ -18,7 +18,7 @@ class WallpaperActivity : AppCompatActivity() {
 
     private lateinit var wallpaperImage: ImageView
     private var loadedBitmap: Bitmap? = null
-    private lateinit var imageUrl: String
+    private var imageUrl: String? = null   // ⚠️ agora nullable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,33 +29,18 @@ class WallpaperActivity : AppCompatActivity() {
         val btnLock = findViewById<Button>(R.id.btnLock)
         val btnBoth = findViewById<Button>(R.id.btnBoth)
 
-        // 🔹 Recebe a URL da imagem
-        imageUrl = intent.getStringExtra("url") ?: ""
-
-        if (imageUrl.isEmpty()) {
-            Toast.makeText(this, "URL inválida", Toast.LENGTH_SHORT).show()
-            finish()
-            return
+        // 🔹 Só tenta pegar a URL se ainda não existe
+        if (imageUrl == null) {
+            imageUrl = intent.getStringExtra("url")
         }
 
-        // 🔹 Carrega a imagem UMA vez e mantém o Bitmap
-        Glide.with(this)
-            .asBitmap()
-            .load(imageUrl)
-            .into(object : CustomTarget<Bitmap>() {
+        // ❌ NÃO finaliza a Activity
+        if (imageUrl.isNullOrEmpty()) {
+            Toast.makeText(this, "Imagem já carregada", Toast.LENGTH_SHORT).show()
+        } else {
+            loadImage(imageUrl!!)
+        }
 
-                override fun onResourceReady(
-                    resource: Bitmap,
-                    transition: Transition<in Bitmap>?
-                ) {
-                    loadedBitmap = resource
-                    wallpaperImage.setImageBitmap(resource)
-                }
-
-                override fun onLoadCleared(placeholder: Drawable?) {}
-            })
-
-        // Botões
         btnHome.setOnClickListener {
             applyWallpaper(WallpaperManager.FLAG_SYSTEM)
         }
@@ -69,6 +54,24 @@ class WallpaperActivity : AppCompatActivity() {
                 WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK
             )
         }
+    }
+
+    private fun loadImage(url: String) {
+        Glide.with(this)
+            .asBitmap()
+            .load(url)
+            .into(object : CustomTarget<Bitmap>() {
+
+                override fun onResourceReady(
+                    resource: Bitmap,
+                    transition: Transition<in Bitmap>?
+                ) {
+                    loadedBitmap = resource
+                    wallpaperImage.setImageBitmap(resource)
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {}
+            })
     }
 
     private fun applyWallpaper(flag: Int) {
