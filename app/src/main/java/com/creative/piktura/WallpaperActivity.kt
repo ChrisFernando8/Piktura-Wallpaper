@@ -15,67 +15,71 @@ import java.io.IOException
 
 class WallpaperActivity : AppCompatActivity() {
 
-    private var loadedBitmap: Bitmap? = null
+    private lateinit var imageView: ImageView
     private lateinit var imageUrl: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wallpaper)
 
-        val imageView = findViewById<ImageView>(R.id.wallpaperImage)
+        imageView = findViewById(R.id.wallpaperImage)
+
         val btnHome = findViewById<Button>(R.id.btnHome)
         val btnLock = findViewById<Button>(R.id.btnLock)
         val btnBoth = findViewById<Button>(R.id.btnBoth)
 
-        imageUrl = intent.getStringExtra("imageUrl") ?: return
+        // 🔹 URL recebida do Adapter
+        imageUrl = intent.getStringExtra("imageUrl") ?: ""
 
-        // 🔥 Carrega UMA VEZ e guarda o Bitmap
+        if (imageUrl.isEmpty()) {
+            Toast.makeText(this, "Erro ao carregar imagem", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
+        // ✅ MOSTRA A IMAGEM NA TELA (NÃO SOME)
+        Glide.with(this)
+            .load(imageUrl)
+            .into(imageView)
+
+        btnHome.setOnClickListener { applyWallpaper(WallpaperManager.FLAG_SYSTEM) }
+        btnLock.setOnClickListener { applyWallpaper(WallpaperManager.FLAG_LOCK) }
+        btnBoth.setOnClickListener {
+            applyWallpaper(WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK)
+        }
+    }
+
+    private fun applyWallpaper(flag: Int) {
         Glide.with(this)
             .asBitmap()
             .load(imageUrl)
             .into(object : CustomTarget<Bitmap>() {
                 override fun onResourceReady(
-                    bitmap: Bitmap,
+                    resource: Bitmap,
                     transition: Transition<in Bitmap>?
                 ) {
-                    loadedBitmap = bitmap
-                    imageView.setImageBitmap(bitmap)
+                    try {
+                        val wm = WallpaperManager.getInstance(this@WallpaperActivity)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            wm.setBitmap(resource, null, true, flag)
+                        } else {
+                            wm.setBitmap(resource)
+                        }
+                        Toast.makeText(
+                            this@WallpaperActivity,
+                            "Wallpaper aplicado",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } catch (e: IOException) {
+                        Toast.makeText(
+                            this@WallpaperActivity,
+                            "Erro ao aplicar wallpaper",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
 
                 override fun onLoadCleared(placeholder: android.graphics.drawable.Drawable?) {}
             })
-
-        btnHome.setOnClickListener {
-            applyWallpaper(WallpaperManager.FLAG_SYSTEM)
-        }
-
-        btnLock.setOnClickListener {
-            applyWallpaper(WallpaperManager.FLAG_LOCK)
-        }
-
-        btnBoth.setOnClickListener {
-            applyWallpaper(
-                WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK
-            )
-        }
-    }
-
-    private fun applyWallpaper(flag: Int) {
-        val bitmap = loadedBitmap ?: run {
-            Toast.makeText(this, "Imagem ainda carregando", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        try {
-            val manager = WallpaperManager.getInstance(this)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                manager.setBitmap(bitmap, null, true, flag)
-            } else {
-                manager.setBitmap(bitmap)
-            }
-            Toast.makeText(this, "Wallpaper aplicado!", Toast.LENGTH_SHORT).show()
-        } catch (e: IOException) {
-            Toast.makeText(this, "Erro ao aplicar wallpaper", Toast.LENGTH_SHORT).show()
-        }
     }
 }
