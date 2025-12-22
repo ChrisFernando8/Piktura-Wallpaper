@@ -27,20 +27,21 @@ class WallpaperActivity : AppCompatActivity() {
         val btnLock = findViewById<Button>(R.id.btnLock)
         val btnBoth = findViewById<Button>(R.id.btnBoth)
 
-        imageUrl = savedInstanceState?.getString("image_url")
-            ?: intent.getStringExtra("url")
+        // ✅ SEMPRE pegar primeiro do Intent
+        imageUrl = intent.getStringExtra("url")
+            ?: savedInstanceState?.getString("image_url")
             ?: ""
 
-        if (imageUrl.isEmpty()) {
+        if (imageUrl.isBlank()) {
             Toast.makeText(this, "URL inválida", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
-        // Preview FULLSCREEN
+        // 🔥 Preview correto (não some mais)
         Glide.with(this)
             .load(imageUrl)
-            .centerCrop()
+            .fitCenter() // mantém proporção
             .into(wallpaperImage)
 
         btnHome.setOnClickListener {
