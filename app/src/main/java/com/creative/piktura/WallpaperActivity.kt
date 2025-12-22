@@ -17,8 +17,8 @@ import java.io.IOException
 class WallpaperActivity : AppCompatActivity() {
 
     private lateinit var wallpaperImage: ImageView
+    private var imageUrl: String = ""
     private var loadedBitmap: Bitmap? = null
-    private var imageUrl: String? = null   // ⚠️ agora nullable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,17 +29,19 @@ class WallpaperActivity : AppCompatActivity() {
         val btnLock = findViewById<Button>(R.id.btnLock)
         val btnBoth = findViewById<Button>(R.id.btnBoth)
 
-        // 🔹 Só tenta pegar a URL se ainda não existe
-        if (imageUrl == null) {
-            imageUrl = intent.getStringExtra("url")
+        // 🔹 RESTAURA A URL (intent ou savedInstance)
+        imageUrl = savedInstanceState?.getString("imageUrl")
+            ?: intent.getStringExtra("url")
+            ?: ""
+
+        if (imageUrl.isEmpty()) {
+            Toast.makeText(this, "Erro ao carregar imagem", Toast.LENGTH_SHORT).show()
+            finish()
+            return
         }
 
-        // ❌ NÃO finaliza a Activity
-        if (imageUrl.isNullOrEmpty()) {
-            Toast.makeText(this, "Imagem já carregada", Toast.LENGTH_SHORT).show()
-        } else {
-            loadImage(imageUrl!!)
-        }
+        // 🔹 SEMPRE recarrega a imagem na tela
+        loadImage(imageUrl)
 
         btnHome.setOnClickListener {
             applyWallpaper(WallpaperManager.FLAG_SYSTEM)
@@ -54,6 +56,11 @@ class WallpaperActivity : AppCompatActivity() {
                 WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK
             )
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("imageUrl", imageUrl)
     }
 
     private fun loadImage(url: String) {
@@ -90,7 +97,6 @@ class WallpaperActivity : AppCompatActivity() {
             } else {
                 wallpaperManager.setBitmap(bitmap)
             }
-
             Toast.makeText(this, "Wallpaper aplicado!", Toast.LENGTH_SHORT).show()
 
         } catch (e: IOException) {
