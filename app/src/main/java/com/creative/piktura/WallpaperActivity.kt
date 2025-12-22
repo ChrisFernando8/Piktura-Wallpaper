@@ -1,72 +1,99 @@
 package com.creative.piktura
 
-import android.content.Intent
-import android.net.Uri
+import android.app.WallpaperManager
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.FileProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import java.io.File
-import java.io.FileOutputStream
 
 class WallpaperActivity : AppCompatActivity() {
 
-    private lateinit var imageUrl: String
     private lateinit var wallpaperImage: ImageView
+    private lateinit var imageUrl: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wallpaper)
 
         wallpaperImage = findViewById(R.id.wallpaperImage)
+        val btnHome = findViewById<Button>(R.id.btnHome)
+        val btnLock = findViewById<Button>(R.id.btnLock)
+        val btnBoth = findViewById<Button>(R.id.btnBoth)
 
-        imageUrl = intent.getStringExtra("url") ?: ""
+        imageUrl = savedInstanceState?.getString("image_url")
+            ?: intent.getStringExtra("url")
+            ?: ""
+
         if (imageUrl.isEmpty()) {
             Toast.makeText(this, "URL inválida", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
-        // Preview normal
+        // Preview FULLSCREEN
         Glide.with(this)
             .load(imageUrl)
+            .centerCrop()
             .into(wallpaperImage)
 
-        // Clique na imagem abre o picker nativo
-        wallpaperImage.setOnClickListener {
-            openSystemWallpaperPicker()
+        btnHome.setOnClickListener {
+            applyWallpaper(WallpaperManager.FLAG_SYSTEM)
+        }
+
+        btnLock.setOnClickListener {
+            applyWallpaper(WallpaperManager.FLAG_LOCK)
+        }
+
+        btnBoth.setOnClickListener {
+            applyWallpaper(WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK)
         }
     }
 
-    private fun openSystemWallpaperPicker() {
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("image_url", imageUrl)
+    }
+
+    private fun applyWallpaper(flag: Int) {
+        val manager = WallpaperManager.getInstance(this)
+
         Glide.with(this)
-            .asFile()
+            .asBitmap()
             .load(imageUrl)
-            .into(object : CustomTarget<File>() {
+            .into(object : CustomTarget<Bitmap>() {
+
                 override fun onResourceReady(
-                    resource: File,
-                    transition: Transition<in File>?
+                    resource: Bitmap,
+                    transition: Transition<in Bitmap>?
                 ) {
-                    val uri: Uri = FileProvider.getUriForFile(
-                        this@WallpaperActivity,
-                        "$packageName.provider",
-                        resource
-                    )
-
-                    val intent = Intent(Intent.ACTION_ATTACH_DATA).apply {
-                        setDataAndType(uri, "image/*")
-                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                        putExtra("mimeType", "image/*")
+                    try {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            manager.setBitmap(resource, null, true, flag)
+                        } else {
+                            manager.setBitmap(resource)
+                        }
+                        Toast.makeText(
+                            this@WallpaperActivity,
+                            "Wallpaper aplicado!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } catch (e: Exception) {
+                        Toast.makeText(
+                            this@WallpaperActivity,
+                            "Erro ao aplicar wallpaper",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
-
-                    startActivity(Intent.createChooser(intent, "Set Wallpaper"))
                 }
 
-                override fun onLoadCleared(placeholder: android.graphics.drawable.Drawable?) {}
+                override fun onLoadCleared(placeholder: Drawable?) {}
             })
     }
 }
