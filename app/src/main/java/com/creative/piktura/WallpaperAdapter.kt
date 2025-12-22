@@ -27,7 +27,10 @@ class WallpaperAdapter(
             .into(holder.image)
 
         holder.itemView.setOnClickListener {
-            val intent = Intent(holder.itemView.context, WallpaperActivity::class.java)
+            val intent = Intent(
+                holder.itemView.context,
+                WallpaperActivity::class.java
+            )
             intent.putExtra("image_url", url)
             holder.itemView.context.startActivity(intent)
         }
