@@ -2,7 +2,6 @@ package com.creative.piktura
 
 import android.app.WallpaperManager
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import android.os.Bundle
 import android.widget.Button
@@ -24,43 +23,60 @@ class WallpaperActivity : AppCompatActivity() {
         val btnLock = findViewById<Button>(R.id.btnLock)
         val btnBoth = findViewById<Button>(R.id.btnBoth)
 
-        val imageUrl = intent.getStringExtra("wallpaperUrl") ?: return
+        val url = intent.getStringExtra("url") ?: return
 
         Glide.with(this)
-            .load(imageUrl)
+            .load(url)
+            .fitCenter()
             .into(imageView)
 
-        fun setWallpaper(flag: Int?) {
+        fun applyWallpaper(flag: Int) {
+            val wallpaperManager = WallpaperManager.getInstance(this)
+
             Glide.with(this)
                 .asBitmap()
-                .load(imageUrl)
+                .load(url)
                 .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        transition: Transition<in Bitmap>?
+                    ) {
                         try {
-                            val manager = WallpaperManager.getInstance(this@WallpaperActivity)
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && flag != null) {
-                                manager.setBitmap(resource, null, true, flag)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                wallpaperManager.setBitmap(resource, null, true, flag)
                             } else {
-                                manager.setBitmap(resource)
+                                wallpaperManager.setBitmap(resource)
                             }
-                            Toast.makeText(this@WallpaperActivity, "Wallpaper aplicado!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this@WallpaperActivity,
+                                "Wallpaper aplicado!",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         } catch (e: Exception) {
-                            Toast.makeText(this@WallpaperActivity, "Erro ao aplicar", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this@WallpaperActivity,
+                                "Erro ao aplicar wallpaper",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
 
-                    override fun onLoadCleared(placeholder: android.graphics.drawable.Drawable?) {}
+                    override fun onLoadCleared(placeholder: Drawable?) {}
                 })
         }
 
-        btnHome.setOnClickListener { setWallpaper(WallpaperManager.FLAG_SYSTEM) }
-        btnLock.setOnClickListener { setWallpaper(WallpaperManager.FLAG_LOCK) }
+        btnHome.setOnClickListener {
+            applyWallpaper(WallpaperManager.FLAG_SYSTEM)
+        }
+
+        btnLock.setOnClickListener {
+            applyWallpaper(WallpaperManager.FLAG_LOCK)
+        }
+
         btnBoth.setOnClickListener {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                setWallpaper(WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK)
-            } else {
-                setWallpaper(null)
-            }
+            applyWallpaper(
+                WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK
+            )
         }
     }
 }
