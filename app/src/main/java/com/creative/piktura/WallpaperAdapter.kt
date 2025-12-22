@@ -30,7 +30,7 @@ class WallpaperAdapter(
 
         holder.image.setOnClickListener {
             val intent = Intent(context, WallpaperActivity::class.java)
-            intent.putExtra("url", url)
+            intent.putExtra("Imageurl", url)
             context.startActivity(intent)
         }
     }
