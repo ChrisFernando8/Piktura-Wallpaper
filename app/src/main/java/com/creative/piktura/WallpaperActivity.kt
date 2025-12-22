@@ -23,12 +23,12 @@ class WallpaperActivity : AppCompatActivity() {
         setContentView(R.layout.activity_wallpaper)
 
         wallpaperImage = findViewById(R.id.wallpaperImage)
+
         val btnHome = findViewById<Button>(R.id.btnHome)
         val btnLock = findViewById<Button>(R.id.btnLock)
         val btnBoth = findViewById<Button>(R.id.btnBoth)
 
-        // 🔥 SEMPRE pega do Intent (fonte única)
-        imageUrl = intent.getStringExtra("url") ?: ""
+        imageUrl = intent.getStringExtra("WALLPAPER_URL") ?: ""
 
         if (imageUrl.isBlank()) {
             Toast.makeText(this, "Erro ao carregar imagem", Toast.LENGTH_SHORT).show()
@@ -36,44 +36,43 @@ class WallpaperActivity : AppCompatActivity() {
             return
         }
 
-        // 🔥 PREVIEW FULLSCREEN
+        // Preview fullscreen
         Glide.with(this)
             .load(imageUrl)
             .centerCrop()
             .into(wallpaperImage)
 
         btnHome.setOnClickListener {
-            setWallpaper(WallpaperManager.FLAG_SYSTEM)
+            applyWallpaper(WallpaperManager.FLAG_SYSTEM)
         }
 
         btnLock.setOnClickListener {
-            setWallpaper(WallpaperManager.FLAG_LOCK)
+            applyWallpaper(WallpaperManager.FLAG_LOCK)
         }
 
         btnBoth.setOnClickListener {
-            setWallpaper(
+            applyWallpaper(
                 WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK
             )
         }
     }
 
-    private fun setWallpaper(flag: Int) {
+    private fun applyWallpaper(flag: Int) {
         val manager = WallpaperManager.getInstance(this)
 
         Glide.with(this)
             .asBitmap()
             .load(imageUrl)
             .into(object : CustomTarget<Bitmap>() {
-
                 override fun onResourceReady(
-                    bitmap: Bitmap,
+                    resource: Bitmap,
                     transition: Transition<in Bitmap>?
                 ) {
                     try {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            manager.setBitmap(bitmap, null, true, flag)
+                            manager.setBitmap(resource, null, true, flag)
                         } else {
-                            manager.setBitmap(bitmap)
+                            manager.setBitmap(resource)
                         }
                         Toast.makeText(
                             this@WallpaperActivity,
