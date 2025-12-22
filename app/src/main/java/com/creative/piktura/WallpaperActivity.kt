@@ -2,6 +2,7 @@ package com.creative.piktura
 
 import android.app.WallpaperManager
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.widget.Button
@@ -15,41 +16,48 @@ import java.io.IOException
 
 class WallpaperActivity : AppCompatActivity() {
 
-    private lateinit var imageView: ImageView
+    private lateinit var wallpaperImage: ImageView
     private lateinit var imageUrl: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wallpaper)
 
-        imageView = findViewById(R.id.wallpaperImage)
-
+        wallpaperImage = findViewById(R.id.wallpaperImage)
         val btnHome = findViewById<Button>(R.id.btnHome)
         val btnLock = findViewById<Button>(R.id.btnLock)
         val btnBoth = findViewById<Button>(R.id.btnBoth)
 
-        // 🔹 URL recebida do Adapter
-        imageUrl = intent.getStringExtra("imageUrl") ?: ""
+        // 🔹 Recebe a URL corretamente
+        imageUrl = intent.getStringExtra("url") ?: ""
 
         if (imageUrl.isEmpty()) {
-            Toast.makeText(this, "Erro ao carregar imagem", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "URL inválida", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
-        // ✅ MOSTRA A IMAGEM NA TELA (NÃO SOME)
+        // 🔹 CARREGA A IMAGEM NA TELA (isso estava faltando)
         Glide.with(this)
             .load(imageUrl)
-            .into(imageView)
+            .into(wallpaperImage)
 
-        btnHome.setOnClickListener { applyWallpaper(WallpaperManager.FLAG_SYSTEM) }
-        btnLock.setOnClickListener { applyWallpaper(WallpaperManager.FLAG_LOCK) }
+        btnHome.setOnClickListener {
+            applyWallpaper(WallpaperManager.FLAG_SYSTEM)
+        }
+
+        btnLock.setOnClickListener {
+            applyWallpaper(WallpaperManager.FLAG_LOCK)
+        }
+
         btnBoth.setOnClickListener {
             applyWallpaper(WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK)
         }
     }
 
     private fun applyWallpaper(flag: Int) {
+        val wallpaperManager = WallpaperManager.getInstance(this)
+
         Glide.with(this)
             .asBitmap()
             .load(imageUrl)
@@ -59,27 +67,26 @@ class WallpaperActivity : AppCompatActivity() {
                     transition: Transition<in Bitmap>?
                 ) {
                     try {
-                        val wm = WallpaperManager.getInstance(this@WallpaperActivity)
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            wm.setBitmap(resource, null, true, flag)
+                            wallpaperManager.setBitmap(resource, null, true, flag)
                         } else {
-                            wm.setBitmap(resource)
+                            wallpaperManager.setBitmap(resource)
                         }
                         Toast.makeText(
                             this@WallpaperActivity,
-                            "Wallpaper aplicado",
+                            "Wallpaper aplicado!",
                             Toast.LENGTH_SHORT
                         ).show()
                     } catch (e: IOException) {
                         Toast.makeText(
                             this@WallpaperActivity,
-                            "Erro ao aplicar wallpaper",
+                            "Erro ao definir wallpaper",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
                 }
 
-                override fun onLoadCleared(placeholder: android.graphics.drawable.Drawable?) {}
+                override fun onLoadCleared(placeholder: Drawable?) {}
             })
     }
 }
