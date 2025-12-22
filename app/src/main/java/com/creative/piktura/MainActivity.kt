@@ -13,7 +13,6 @@ class MainActivity : AppCompatActivity() {
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
 
-        // 🔗 Lista de wallpapers por URL (Cloudinary)
         val wallpapers = listOf(
             "https://raw.githubusercontent.com/ChrisFernando8/Imagens-piktura/main/Wallpapers/wp1.jpg",
             "https://raw.githubusercontent.com/ChrisFernando8/Imagens-piktura/main/Wallpapers/wp2.jpg",
@@ -21,6 +20,6 @@ class MainActivity : AppCompatActivity() {
         )
 
         recyclerView.layoutManager = GridLayoutManager(this, 2)
-        recyclerView.adapter = WallpaperAdapter(this, wallpapers)
+        recyclerView.adapter = WallpaperAdapter(wallpapers)
     }
 }
