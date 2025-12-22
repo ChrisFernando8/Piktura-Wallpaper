@@ -17,6 +17,7 @@ import java.io.IOException
 class WallpaperActivity : AppCompatActivity() {
 
     private lateinit var wallpaperImage: ImageView
+    private var loadedBitmap: Bitmap? = null
     private lateinit var imageUrl: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,7 +29,7 @@ class WallpaperActivity : AppCompatActivity() {
         val btnLock = findViewById<Button>(R.id.btnLock)
         val btnBoth = findViewById<Button>(R.id.btnBoth)
 
-        // 🔹 Recebe a URL corretamente
+        // 🔹 Recebe a URL da imagem
         imageUrl = intent.getStringExtra("url") ?: ""
 
         if (imageUrl.isEmpty()) {
@@ -37,11 +38,24 @@ class WallpaperActivity : AppCompatActivity() {
             return
         }
 
-        // 🔹 CARREGA A IMAGEM NA TELA (isso estava faltando)
+        // 🔹 Carrega a imagem UMA vez e mantém o Bitmap
         Glide.with(this)
+            .asBitmap()
             .load(imageUrl)
-            .into(wallpaperImage)
+            .into(object : CustomTarget<Bitmap>() {
 
+                override fun onResourceReady(
+                    resource: Bitmap,
+                    transition: Transition<in Bitmap>?
+                ) {
+                    loadedBitmap = resource
+                    wallpaperImage.setImageBitmap(resource)
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {}
+            })
+
+        // Botões
         btnHome.setOnClickListener {
             applyWallpaper(WallpaperManager.FLAG_SYSTEM)
         }
@@ -51,42 +65,33 @@ class WallpaperActivity : AppCompatActivity() {
         }
 
         btnBoth.setOnClickListener {
-            applyWallpaper(WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK)
+            applyWallpaper(
+                WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK
+            )
         }
     }
 
     private fun applyWallpaper(flag: Int) {
+        val bitmap = loadedBitmap
+
+        if (bitmap == null) {
+            Toast.makeText(this, "Imagem ainda carregando", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val wallpaperManager = WallpaperManager.getInstance(this)
 
-        Glide.with(this)
-            .asBitmap()
-            .load(imageUrl)
-            .into(object : CustomTarget<Bitmap>() {
-                override fun onResourceReady(
-                    resource: Bitmap,
-                    transition: Transition<in Bitmap>?
-                ) {
-                    try {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            wallpaperManager.setBitmap(resource, null, true, flag)
-                        } else {
-                            wallpaperManager.setBitmap(resource)
-                        }
-                        Toast.makeText(
-                            this@WallpaperActivity,
-                            "Wallpaper aplicado!",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } catch (e: IOException) {
-                        Toast.makeText(
-                            this@WallpaperActivity,
-                            "Erro ao definir wallpaper",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                wallpaperManager.setBitmap(bitmap, null, true, flag)
+            } else {
+                wallpaperManager.setBitmap(bitmap)
+            }
 
-                override fun onLoadCleared(placeholder: Drawable?) {}
-            })
+            Toast.makeText(this, "Wallpaper aplicado!", Toast.LENGTH_SHORT).show()
+
+        } catch (e: IOException) {
+            Toast.makeText(this, "Erro ao definir wallpaper", Toast.LENGTH_SHORT).show()
+        }
     }
 }
