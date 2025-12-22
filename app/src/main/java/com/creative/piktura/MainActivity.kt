@@ -13,7 +13,7 @@ class MainActivity : AppCompatActivity() {
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
 
-        // URLs do Cloudinary
+        // 🔗 Lista de wallpapers por URL (Cloudinary)
         val wallpapers = listOf(
             "https://res.cloudinary.com/dbtturm2d/image/upload/v1766310175/wp1.jpg",
             "https://res.cloudinary.com/dbtturm2d/image/upload/v1766310175/wp2.jpg",
