@@ -15,6 +15,10 @@ import com.bumptech.glide.request.transition.Transition
 
 class WallpaperActivity : AppCompatActivity() {
 
+    companion object {
+        const val EXTRA_WALLPAPER_URL = "EXTRA_WALLPAPER_URL"
+    }
+
     private lateinit var wallpaperImage: ImageView
     private lateinit var imageUrl: String
 
@@ -27,39 +31,34 @@ class WallpaperActivity : AppCompatActivity() {
         val btnLock = findViewById<Button>(R.id.btnLock)
         val btnBoth = findViewById<Button>(R.id.btnBoth)
 
-        // 🔹 URL vem SOMENTE da Intent
-        imageUrl = intent.getStringExtra("url") ?: ""
+        imageUrl = intent.getStringExtra(EXTRA_WALLPAPER_URL) ?: ""
 
-        if (imageUrl.isEmpty()) {
+        if (imageUrl.isBlank()) {
             Toast.makeText(this, "Erro ao carregar imagem", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
-        // 🔹 Preview em tela cheia (sem clique!)
+        // 🔥 Preview igual app profissional
         Glide.with(this)
             .load(imageUrl)
-            .fitCenter()
+            .fitCenter() // NÃO some a imagem
             .into(wallpaperImage)
 
-        // ❌ NÃO coloque setOnClickListener na imagem
-
         btnHome.setOnClickListener {
-            applyWallpaper(WallpaperManager.FLAG_SYSTEM)
+            setWallpaper(WallpaperManager.FLAG_SYSTEM)
         }
 
         btnLock.setOnClickListener {
-            applyWallpaper(WallpaperManager.FLAG_LOCK)
+            setWallpaper(WallpaperManager.FLAG_LOCK)
         }
 
         btnBoth.setOnClickListener {
-            applyWallpaper(
-                WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK
-            )
+            setWallpaper(WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK)
         }
     }
 
-    private fun applyWallpaper(flag: Int) {
+    private fun setWallpaper(flag: Int) {
         val manager = WallpaperManager.getInstance(this)
 
         Glide.with(this)
@@ -77,13 +76,11 @@ class WallpaperActivity : AppCompatActivity() {
                         } else {
                             manager.setBitmap(resource)
                         }
-
                         Toast.makeText(
                             this@WallpaperActivity,
                             "Wallpaper aplicado!",
                             Toast.LENGTH_SHORT
                         ).show()
-
                     } catch (e: Exception) {
                         Toast.makeText(
                             this@WallpaperActivity,
