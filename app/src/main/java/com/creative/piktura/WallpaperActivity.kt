@@ -18,7 +18,7 @@ class WallpaperActivity : AppCompatActivity() {
 
     private lateinit var wallpaperImage: ImageView
     private var imageUrl: String = ""
-    private var loadedBitmap: Bitmap? = null
+    private var bitmapLoaded: Bitmap? = null   // 🔹 GUARDA O BITMAP
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,19 +29,16 @@ class WallpaperActivity : AppCompatActivity() {
         val btnLock = findViewById<Button>(R.id.btnLock)
         val btnBoth = findViewById<Button>(R.id.btnBoth)
 
-        // 🔹 RESTAURA A URL (intent ou savedInstance)
-        imageUrl = savedInstanceState?.getString("imageUrl")
-            ?: intent.getStringExtra("url")
-            ?: ""
+        imageUrl = intent.getStringExtra("url") ?: ""
 
         if (imageUrl.isEmpty()) {
-            Toast.makeText(this, "Erro ao carregar imagem", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "URL inválida", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
-        // 🔹 SEMPRE recarrega a imagem na tela
-        loadImage(imageUrl)
+        // 🔹 CARREGA UMA ÚNICA VEZ
+        loadImageOnce()
 
         btnHome.setOnClickListener {
             applyWallpaper(WallpaperManager.FLAG_SYSTEM)
@@ -58,22 +55,17 @@ class WallpaperActivity : AppCompatActivity() {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString("imageUrl", imageUrl)
-    }
-
-    private fun loadImage(url: String) {
+    private fun loadImageOnce() {
         Glide.with(this)
             .asBitmap()
-            .load(url)
+            .load(imageUrl)
             .into(object : CustomTarget<Bitmap>() {
 
                 override fun onResourceReady(
                     resource: Bitmap,
                     transition: Transition<in Bitmap>?
                 ) {
-                    loadedBitmap = resource
+                    bitmapLoaded = resource
                     wallpaperImage.setImageBitmap(resource)
                 }
 
@@ -82,25 +74,25 @@ class WallpaperActivity : AppCompatActivity() {
     }
 
     private fun applyWallpaper(flag: Int) {
-        val bitmap = loadedBitmap
+        val bitmap = bitmapLoaded
 
         if (bitmap == null) {
             Toast.makeText(this, "Imagem ainda carregando", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val wallpaperManager = WallpaperManager.getInstance(this)
+        val manager = WallpaperManager.getInstance(this)
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                wallpaperManager.setBitmap(bitmap, null, true, flag)
+                manager.setBitmap(bitmap, null, true, flag)
             } else {
-                wallpaperManager.setBitmap(bitmap)
+                manager.setBitmap(bitmap)
             }
             Toast.makeText(this, "Wallpaper aplicado!", Toast.LENGTH_SHORT).show()
 
         } catch (e: IOException) {
-            Toast.makeText(this, "Erro ao definir wallpaper", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Erro ao aplicar wallpaper", Toast.LENGTH_SHORT).show()
         }
     }
 }
