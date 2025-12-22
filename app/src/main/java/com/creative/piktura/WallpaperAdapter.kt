@@ -15,7 +15,7 @@ class WallpaperAdapter(
 ) : RecyclerView.Adapter<WallpaperAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(context)
+        val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_wallpaper, parent, false)
         return ViewHolder(view)
     }
@@ -23,14 +23,14 @@ class WallpaperAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val url = wallpapers[position]
 
-        Glide.with(context)
+        Glide.with(holder.image)
             .load(url)
             .centerCrop()
             .into(holder.image)
 
         holder.itemView.setOnClickListener {
             val intent = Intent(context, WallpaperActivity::class.java)
-            intent.putExtra("WALLPAPER_URL", url)
+            intent.putExtra(WallpaperActivity.EXTRA_WALLPAPER_URL, url)
             context.startActivity(intent)
         }
     }
