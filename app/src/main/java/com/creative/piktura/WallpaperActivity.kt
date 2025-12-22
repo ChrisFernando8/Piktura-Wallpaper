@@ -23,24 +23,26 @@ class WallpaperActivity : AppCompatActivity() {
         setContentView(R.layout.activity_wallpaper)
 
         wallpaperImage = findViewById(R.id.wallpaperImage)
-
         val btnHome = findViewById<Button>(R.id.btnHome)
         val btnLock = findViewById<Button>(R.id.btnLock)
         val btnBoth = findViewById<Button>(R.id.btnBoth)
 
-        imageUrl = intent.getStringExtra("WALLPAPER_URL") ?: ""
+        // 🔹 URL vem SOMENTE da Intent
+        imageUrl = intent.getStringExtra("url") ?: ""
 
-        if (imageUrl.isBlank()) {
+        if (imageUrl.isEmpty()) {
             Toast.makeText(this, "Erro ao carregar imagem", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
-        // Preview fullscreen
+        // 🔹 Preview em tela cheia (sem clique!)
         Glide.with(this)
             .load(imageUrl)
-            .centerCrop()
+            .fitCenter()
             .into(wallpaperImage)
+
+        // ❌ NÃO coloque setOnClickListener na imagem
 
         btnHome.setOnClickListener {
             applyWallpaper(WallpaperManager.FLAG_SYSTEM)
@@ -64,6 +66,7 @@ class WallpaperActivity : AppCompatActivity() {
             .asBitmap()
             .load(imageUrl)
             .into(object : CustomTarget<Bitmap>() {
+
                 override fun onResourceReady(
                     resource: Bitmap,
                     transition: Transition<in Bitmap>?
@@ -74,11 +77,13 @@ class WallpaperActivity : AppCompatActivity() {
                         } else {
                             manager.setBitmap(resource)
                         }
+
                         Toast.makeText(
                             this@WallpaperActivity,
                             "Wallpaper aplicado!",
                             Toast.LENGTH_SHORT
                         ).show()
+
                     } catch (e: Exception) {
                         Toast.makeText(
                             this@WallpaperActivity,
