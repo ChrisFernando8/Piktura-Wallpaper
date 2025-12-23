@@ -8,6 +8,7 @@
         android:label="Piktura"
         android:theme="@style/Theme.Material3.DayNight.NoActionBar">
 
+        <!-- Tela inicial -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -17,10 +18,10 @@
             </intent-filter>
         </activity>
 
+        <!-- ✅ TELA DE PREVIEW (CORRIGIDO) -->
         <activity
             android:name=".WallpaperActivity"
-            android:exported="false" />
+            android:exported="true" />
 
     </application>
-
 </manifest>
