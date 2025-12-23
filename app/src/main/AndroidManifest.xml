@@ -12,7 +12,6 @@
         android:name=".PikturaApp"
         android:label="Piktura"
         android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/Theme.Piktura">
 
         <!-- Tela inicial (GRID) -->
