@@ -1,4 +1,4 @@
-package com.creative.piktura.data
+package com.creative.piktura.data.repository
 
 import com.creative.piktura.domain.model.Wallpaper
 
@@ -8,11 +8,11 @@ object WallpaperRepository {
         return listOf(
             Wallpaper(
                 id = "1",
-                imageUrl = "https://raw.githubusercontent.com/SEU_USUARIO/SEU_REPO/main/images/wall1.jpg"
+                url = "https://raw.githubusercontent.com/SEU_USUARIO/SEU_REPO/main/wallpapers/w1.jpg"
             ),
             Wallpaper(
                 id = "2",
-                imageUrl = "https://raw.githubusercontent.com/SEU_USUARIO/SEU_REPO/main/images/wall2.jpg"
+                url = "https://raw.githubusercontent.com/SEU_USUARIO/SEU_REPO/main/wallpapers/w2.jpg"
             )
         )
     }
