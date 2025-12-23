@@ -1,5 +1,6 @@
 package com.creative.piktura.ui.main
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,14 +9,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.creative.piktura.R
 import com.creative.piktura.domain.model.Wallpaper
+import com.creative.piktura.ui.preview.WallpaperActivity
 
 class WallpaperAdapter(
-    private val wallpapers: List<Wallpaper>,
-    private val onClick: (Wallpaper) -> Unit
+    private val wallpapers: List<Wallpaper>
 ) : RecyclerView.Adapter<WallpaperAdapter.ViewHolder>() {
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val image: ImageView = itemView.findViewById(R.id.wallpaperImage)
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val image: ImageView = view.findViewById(R.id.imageWallpaper)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -28,14 +29,16 @@ class WallpaperAdapter(
         val wallpaper = wallpapers[position]
 
         Glide.with(holder.itemView)
-            .load(wallpaper.url)
+            .load(wallpaper.imageUrl)
             .centerCrop()
             .into(holder.image)
 
         holder.itemView.setOnClickListener {
-            onClick(wallpaper)
+            val intent = Intent(holder.itemView.context, WallpaperActivity::class.java)
+            intent.putExtra("imageUrl", wallpaper.imageUrl)
+            holder.itemView.context.startActivity(intent)
         }
     }
 
-    override fun getItemCount(): Int = wallpapers.size
+    override fun getItemCount() = wallpapers.size
 }
