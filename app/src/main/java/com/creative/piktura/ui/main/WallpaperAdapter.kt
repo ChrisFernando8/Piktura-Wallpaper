@@ -12,7 +12,7 @@ import com.creative.piktura.domain.model.Wallpaper
 import com.creative.piktura.ui.preview.WallpaperActivity
 
 class WallpaperAdapter(
-    private val wallpapers: List<Wallpaper>
+    private val items: List<Wallpaper>
 ) : RecyclerView.Adapter<WallpaperAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -26,19 +26,19 @@ class WallpaperAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val wallpaper = wallpapers[position]
+        val wallpaper = items[position]
 
-        Glide.with(holder.itemView)
-            .load(wallpaper.imageUrl)
+        Glide.with(holder.itemView.context)
+            .load(wallpaper.url)
             .centerCrop()
             .into(holder.image)
 
         holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context, WallpaperActivity::class.java)
-            intent.putExtra("imageUrl", wallpaper.imageUrl)
+            intent.putExtra("wallpaper", wallpaper)
             holder.itemView.context.startActivity(intent)
         }
     }
 
-    override fun getItemCount() = wallpapers.size
+    override fun getItemCount(): Int = items.size
 }
