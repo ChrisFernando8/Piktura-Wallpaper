@@ -1,13 +1,19 @@
-package com.creative.piktura.data.repository
+package com.creative.piktura.data
 
-import com.creative.piktura.data.model.Wallpaper
+import com.creative.piktura.domain.model.Wallpaper
 
-class WallpaperRepository {
+object WallpaperRepository {
 
     fun getWallpapers(): List<Wallpaper> {
         return listOf(
-            Wallpaper("1", "https://SEU_LINK_AQUI.jpg"),
-            Wallpaper("2", "https://SEU_LINK_AQUI.jpg")
+            Wallpaper(
+                id = "1",
+                imageUrl = "https://raw.githubusercontent.com/SEU_USUARIO/SEU_REPO/main/images/wall1.jpg"
+            ),
+            Wallpaper(
+                id = "2",
+                imageUrl = "https://raw.githubusercontent.com/SEU_USUARIO/SEU_REPO/main/images/wall2.jpg"
+            )
         )
     }
 }
