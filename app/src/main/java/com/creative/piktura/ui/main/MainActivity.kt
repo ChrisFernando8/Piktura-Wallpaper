@@ -15,9 +15,9 @@ class MainActivity : AppCompatActivity() {
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
 
         val wallpapers = listOf(
-            "https://raw.githubusercontent.com/ChrisFernando8/Imagens-piktura/main/Wallpapers/wp1.jpg",
-            "https://raw.githubusercontent.com/ChrisFernando8/Imagens-piktura/main/Wallpapers/wp2.jpg",
-            "https://raw.githubusercontent.com/ChrisFernando8/Imagens-piktura/main/Wallpapers/wp3.jpg"
+            "https://raw.githubusercontent.com/ChrisFernando8/Imagens-piktura/master/Wallpapers/wp1.jpg",
+            "https://raw.githubusercontent.com/ChrisFernando8/imagens-piktura/master/Wallpapers/wp2.jpg",
+            "https://raw.githubusercontent.com/ChrisFernando8/imagens-piktura/master/Wallpapers/wp3.jpg"
         )
 
         recyclerView.layoutManager = GridLayoutManager(this, 2)
