@@ -4,20 +4,28 @@ import android.app.WallpaperManager
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Build
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 object WallpaperApplier {
 
-    fun apply(
+    suspend fun applyFromUrl(
         context: Context,
         bitmap: Bitmap,
-        flag: Int
-    ) {
-        val manager = WallpaperManager.getInstance(context)
+        target: Int
+    ): Boolean = withContext(Dispatchers.IO) {
+        try {
+            val manager = WallpaperManager.getInstance(context)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            manager.setBitmap(bitmap, null, true, flag)
-        } else {
-            manager.setBitmap(bitmap)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                manager.setBitmap(bitmap, null, true, target)
+            } else {
+                manager.setBitmap(bitmap)
+            }
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
         }
     }
 }
