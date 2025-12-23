@@ -7,7 +7,7 @@
 
     <application
         android:label="Piktura"
-        android:theme="@style/Theme.Material3.DayNight.NoActionBar">
+        android:theme="@style/Theme.Piktura">
 
         <!-- Tela inicial -->
         <activity
