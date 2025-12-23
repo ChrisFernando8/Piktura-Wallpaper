@@ -1,36 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.creative.piktura">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Permissões -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.SET_WALLPAPER" />
-    <uses-permission android:name="android.permission.SET_WALLPAPER_HINTS" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.SET_WALLPAPER"/>
 
     <application
-        android:name=".PikturaApp"
-        android:label="Piktura"
+        android:label="Piktura Wallpapers"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/Theme.Piktura">
 
-        <!-- Tela inicial (GRID) -->
         <activity
             android:name="com.creative.piktura.ui.main.MainActivity"
-            android:exported="true"
-            android:screenOrientation="portrait">
-
+            android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
-        <!-- Tela de preview -->
         <activity
             android:name="com.creative.piktura.ui.preview.WallpaperActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-
+            android:exported="true"/>
     </application>
-
 </manifest>
