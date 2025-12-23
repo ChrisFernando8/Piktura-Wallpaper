@@ -36,19 +36,30 @@ class WallpaperActivity : AppCompatActivity() {
             .load(imageUrl)
             .into(wallpaperImage)
 
+        // ✅ HOME funciona em qualquer versão
         btnHome.setOnClickListener {
             applyWallpaper(imageUrl, WallpaperManager.FLAG_SYSTEM)
         }
 
+        // 🔒 LOCK → só Android 7+
         btnLock.setOnClickListener {
-            applyWallpaper(imageUrl, WallpaperManager.FLAG_LOCK)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                applyWallpaper(imageUrl, WallpaperManager.FLAG_LOCK)
+            } else {
+                Toast.makeText(this, "Lock Screen não suportado neste Android", Toast.LENGTH_SHORT).show()
+            }
         }
 
+        // 🔥 BOTH → só Android 7+
         btnBoth.setOnClickListener {
-            applyWallpaper(
-                imageUrl,
-                WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK
-            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                applyWallpaper(
+                    imageUrl,
+                    WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK
+                )
+            } else {
+                Toast.makeText(this, "Opção não suportada neste Android", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -59,6 +70,7 @@ class WallpaperActivity : AppCompatActivity() {
             .asBitmap()
             .load(url)
             .into(object : CustomTarget<Bitmap>() {
+
                 override fun onResourceReady(
                     resource: Bitmap,
                     transition: Transition<in Bitmap>?
@@ -69,9 +81,19 @@ class WallpaperActivity : AppCompatActivity() {
                         } else {
                             manager.setBitmap(resource)
                         }
-                        Toast.makeText(this@WallpaperActivity, "Wallpaper aplicado!", Toast.LENGTH_SHORT).show()
+
+                        Toast.makeText(
+                            this@WallpaperActivity,
+                            "Wallpaper aplicado!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
                     } catch (e: Exception) {
-                        Toast.makeText(this@WallpaperActivity, "Erro ao aplicar wallpaper", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@WallpaperActivity,
+                            "Erro ao aplicar wallpaper",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
 
