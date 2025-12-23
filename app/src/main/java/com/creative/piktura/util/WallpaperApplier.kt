@@ -3,30 +3,21 @@ package com.creative.piktura.util
 import android.app.WallpaperManager
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import java.net.URL
+import android.os.Build
 
 object WallpaperApplier {
 
-    fun applyFromUrl(
+    fun apply(
         context: Context,
-        imageUrl: String,
-        flag: Int,
-        onSuccess: () -> Unit,
-        onError: () -> Unit
+        bitmap: Bitmap,
+        flag: Int
     ) {
-        Thread {
-            try {
-                val stream = URL(imageUrl).openStream()
-                val bitmap = BitmapFactory.decodeStream(stream)
+        val manager = WallpaperManager.getInstance(context)
 
-                val manager = WallpaperManager.getInstance(context)
-                manager.setBitmap(bitmap, null, true, flag)
-
-                onSuccess()
-            } catch (e: Exception) {
-                onError()
-            }
-        }.start()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            manager.setBitmap(bitmap, null, true, flag)
+        } else {
+            manager.setBitmap(bitmap)
+        }
     }
 }
