@@ -8,16 +8,11 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.creative.piktura.R
-import com.creative.piktura.domain.model.Wallpaper
 import com.creative.piktura.ui.preview.WallpaperActivity
 
 class WallpaperAdapter(
-    private val items: List<Wallpaper>
+    private val wallpapers: List<String>
 ) : RecyclerView.Adapter<WallpaperAdapter.ViewHolder>() {
-
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val image: ImageView = view.findViewById(R.id.imageWallpaper)
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -26,19 +21,23 @@ class WallpaperAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val wallpaper = items[position]
+        val url = wallpapers[position]
 
-        Glide.with(holder.itemView.context)
-            .load(wallpaper.url)
+        Glide.with(holder.image.context)
+            .load(url)
             .centerCrop()
             .into(holder.image)
 
         holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context, WallpaperActivity::class.java)
-            intent.putExtra("wallpaper", wallpaper)
+            intent.putExtra("image_url", url)
             holder.itemView.context.startActivity(intent)
         }
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount() = wallpapers.size
+
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val image: ImageView = itemView.findViewById(R.id.imgWallpaper)
+    }
 }
