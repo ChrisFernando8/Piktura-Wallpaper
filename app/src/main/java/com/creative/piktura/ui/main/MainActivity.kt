@@ -3,9 +3,9 @@ package com.creative.piktura.ui.main
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.creative.piktura.R
-import com.creative.piktura.data.WallpaperRepository
+import com.creative.piktura.data.repository.WallpaperRepository
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -13,11 +13,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val recycler = findViewById<RecyclerView>(R.id.recyclerView)
+        val wallpapers = WallpaperRepository.getWallpapers()
 
-        recycler.layoutManager = GridLayoutManager(this, 2)
-        recycler.adapter = WallpaperAdapter(
-            WallpaperRepository.getWallpapers()
-        )
+        recyclerView.layoutManager = GridLayoutManager(this, 2)
+        recyclerView.adapter = WallpaperAdapter(wallpapers)
     }
 }
