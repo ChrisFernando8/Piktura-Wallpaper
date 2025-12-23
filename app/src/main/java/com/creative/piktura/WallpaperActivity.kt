@@ -32,39 +32,29 @@ class WallpaperActivity : AppCompatActivity() {
             return
         }
 
+        // 🔹 Preview da imagem
         Glide.with(this)
             .load(imageUrl)
             .into(wallpaperImage)
 
-        // ✅ HOME funciona em qualquer versão
         btnHome.setOnClickListener {
-            applyWallpaper(imageUrl, WallpaperManager.FLAG_SYSTEM)
+            setWallpaperFromUrl(imageUrl, WallpaperManager.FLAG_SYSTEM)
         }
 
-        // 🔒 LOCK → só Android 7+
         btnLock.setOnClickListener {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                applyWallpaper(imageUrl, WallpaperManager.FLAG_LOCK)
-            } else {
-                Toast.makeText(this, "Lock Screen não suportado neste Android", Toast.LENGTH_SHORT).show()
-            }
+            setWallpaperFromUrl(imageUrl, WallpaperManager.FLAG_LOCK)
         }
 
-        // 🔥 BOTH → só Android 7+
         btnBoth.setOnClickListener {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                applyWallpaper(
-                    imageUrl,
-                    WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK
-                )
-            } else {
-                Toast.makeText(this, "Opção não suportada neste Android", Toast.LENGTH_SHORT).show()
-            }
+            setWallpaperFromUrl(
+                imageUrl,
+                WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK
+            )
         }
     }
 
-    private fun applyWallpaper(url: String, flag: Int) {
-        val manager = WallpaperManager.getInstance(this)
+    private fun setWallpaperFromUrl(url: String, flag: Int) {
+        val wallpaperManager = WallpaperManager.getInstance(this)
 
         Glide.with(this)
             .asBitmap()
@@ -72,14 +62,14 @@ class WallpaperActivity : AppCompatActivity() {
             .into(object : CustomTarget<Bitmap>() {
 
                 override fun onResourceReady(
-                    resource: Bitmap,
+                    bitmap: Bitmap,
                     transition: Transition<in Bitmap>?
                 ) {
                     try {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            manager.setBitmap(resource, null, true, flag)
+                            wallpaperManager.setBitmap(bitmap, null, true, flag)
                         } else {
-                            manager.setBitmap(resource)
+                            wallpaperManager.setBitmap(bitmap)
                         }
 
                         Toast.makeText(
@@ -94,6 +84,7 @@ class WallpaperActivity : AppCompatActivity() {
                             "Erro ao aplicar wallpaper",
                             Toast.LENGTH_SHORT
                         ).show()
+                        e.printStackTrace()
                     }
                 }
 
