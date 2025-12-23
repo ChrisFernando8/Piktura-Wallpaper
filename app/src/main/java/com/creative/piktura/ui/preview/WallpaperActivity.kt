@@ -16,60 +16,44 @@ import com.creative.piktura.R
 
 class WallpaperActivity : AppCompatActivity() {
 
-    companion object {
-        const val EXTRA_IMAGE_URL = "image_url"
-    }
-
-    private lateinit var wallpaperImage: ImageView
-    private lateinit var imageUrl: String
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wallpaper)
 
-        // Views
-        wallpaperImage = findViewById(R.id.wallpaperImage)
+        val imageView = findViewById<ImageView>(R.id.wallpaperImage)
         val btnHome = findViewById<Button>(R.id.btnHome)
         val btnLock = findViewById<Button>(R.id.btnLock)
         val btnBoth = findViewById<Button>(R.id.btnBoth)
 
-        // Recebe URL
-        imageUrl = intent.getStringExtra(EXTRA_IMAGE_URL) ?: ""
-
-        if (imageUrl.isBlank()) {
-            Toast.makeText(this, "Imagem inválida", Toast.LENGTH_SHORT).show()
+        val imageUrl = intent.getStringExtra("image_url") ?: run {
             finish()
             return
         }
 
-        // 🔹 Preview da imagem (APENAS EXIBIÇÃO)
-        Glide.with(this)
-            .load(imageUrl)
-            .into(wallpaperImage)
+        Glide.with(this).load(imageUrl).into(imageView)
 
-        // Botões
         btnHome.setOnClickListener {
-            applyWallpaper(WallpaperManager.FLAG_SYSTEM)
+            applyWallpaper(imageUrl, WallpaperManager.FLAG_SYSTEM)
         }
 
         btnLock.setOnClickListener {
-            applyWallpaper(WallpaperManager.FLAG_LOCK)
+            applyWallpaper(imageUrl, WallpaperManager.FLAG_LOCK)
         }
 
         btnBoth.setOnClickListener {
-            applyWallpaper(WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK)
+            applyWallpaper(
+                imageUrl,
+                WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK
+            )
         }
     }
 
-    /**
-     * 🔥 Aplica wallpaper baixando o Bitmap corretamente
-     */
-    private fun applyWallpaper(flag: Int) {
-        val wallpaperManager = WallpaperManager.getInstance(this)
+    private fun applyWallpaper(url: String, flag: Int) {
+        val manager = WallpaperManager.getInstance(this)
 
         Glide.with(this)
             .asBitmap()
-            .load(imageUrl)
+            .load(url)
             .into(object : CustomTarget<Bitmap>() {
 
                 override fun onResourceReady(
@@ -78,24 +62,13 @@ class WallpaperActivity : AppCompatActivity() {
                 ) {
                     try {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            wallpaperManager.setBitmap(resource, null, true, flag)
+                            manager.setBitmap(resource, null, true, flag)
                         } else {
-                            wallpaperManager.setBitmap(resource)
+                            manager.setBitmap(resource)
                         }
-
-                        Toast.makeText(
-                            this@WallpaperActivity,
-                            "Wallpaper aplicado com sucesso!",
-                            Toast.LENGTH_SHORT
-                        ).show()
-
+                        Toast.makeText(this@WallpaperActivity, "Wallpaper aplicado!", Toast.LENGTH_SHORT).show()
                     } catch (e: Exception) {
-                        Toast.makeText(
-                            this@WallpaperActivity,
-                            "Erro ao aplicar wallpaper",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        e.printStackTrace()
+                        Toast.makeText(this@WallpaperActivity, "Erro ao aplicar", Toast.LENGTH_SHORT).show()
                     }
                 }
 
