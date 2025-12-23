@@ -12,7 +12,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.creative.piktura.R
-import com.creative.piktura.util.WallpaperApplier
+import com.creative.piktura.domain.model.Wallpaper
 
 class WallpaperActivity : AppCompatActivity() {
 
@@ -22,27 +22,38 @@ class WallpaperActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wallpaper)
 
-        val imageView = findViewById<ImageView>(R.id.wallpaperImage)
+        val image = findViewById<ImageView>(R.id.wallpaperImage)
         val btnHome = findViewById<Button>(R.id.btnHome)
         val btnLock = findViewById<Button>(R.id.btnLock)
         val btnBoth = findViewById<Button>(R.id.btnBoth)
 
-        val imageUrl = intent.getStringExtra("imageUrl") ?: return
+        val wallpaper = intent.getSerializableExtra("wallpaper") as Wallpaper
 
         Glide.with(this)
             .asBitmap()
-            .load(imageUrl)
+            .load(wallpaper.url)
             .into(object : CustomTarget<Bitmap>() {
                 override fun onResourceReady(
                     resource: Bitmap,
                     transition: Transition<in Bitmap>?
                 ) {
                     loadedBitmap = resource
-                    imageView.setImageBitmap(resource)
+                    image.setImageBitmap(resource)
                 }
 
                 override fun onLoadCleared(placeholder: Drawable?) {}
             })
+
+        fun apply(flag: Int) {
+            val bmp = loadedBitmap ?: return
+            try {
+                WallpaperManager.getInstance(this)
+                    .setBitmap(bmp, null, true, flag)
+                Toast.makeText(this, "Wallpaper aplicado", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(this, "Erro ao aplicar wallpaper", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         btnHome.setOnClickListener {
             apply(WallpaperManager.FLAG_SYSTEM)
@@ -55,11 +66,5 @@ class WallpaperActivity : AppCompatActivity() {
         btnBoth.setOnClickListener {
             apply(WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK)
         }
-    }
-
-    private fun apply(flag: Int) {
-        val bitmap = loadedBitmap ?: return
-        WallpaperApplier.apply(this, bitmap, flag)
-        Toast.makeText(this, "Wallpaper aplicado!", Toast.LENGTH_SHORT).show()
     }
 }
