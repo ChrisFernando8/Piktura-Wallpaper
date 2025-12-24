@@ -1,5 +1,6 @@
 package com.creative.piktura.ui.main
 
+import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
@@ -8,36 +9,37 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.creative.piktura.R
-import com.creative.piktura.ui.preview.WallpaperActivity
+import com.creative.piktura.WallpaperActivity
 
 class WallpaperAdapter(
-    private val wallpapers: List<Wallpaper>
+    private val context: Context,
+    private val images: List<String>
 ) : RecyclerView.Adapter<WallpaperAdapter.ViewHolder>() {
 
+    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val imgWallpaper: ImageView = view.findViewById(R.id.imgWallpaper)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
+        val view = LayoutInflater.from(context)
             .inflate(R.layout.item_wallpaper, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = wallpapers[position]
+        val imageUrl = images[position]
 
-        Glide.with(holder.image.context)
-            .load(item.image_url)
+        Glide.with(context)
+            .load(imageUrl)
             .centerCrop()
-            .into(holder.image)
+            .into(holder.imgWallpaper)
 
         holder.itemView.setOnClickListener {
-            val intent = Intent(it.context, WallpaperActivity::class.java)
-            intent.putExtra("image_url", item.image_url)
-            it.context.startActivity(intent)
+            val intent = Intent(context, WallpaperActivity::class.java)
+            intent.putExtra("image_url", imageUrl)
+            context.startActivity(intent)
         }
     }
 
-    override fun getItemCount() = wallpapers.size
-
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val image: ImageView = view.findViewById(R.id.imgWallpaper)
-    }
+    override fun getItemCount(): Int = images.size
 }
