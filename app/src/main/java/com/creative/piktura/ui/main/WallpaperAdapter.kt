@@ -11,7 +11,7 @@ import com.creative.piktura.R
 import com.creative.piktura.ui.preview.WallpaperActivity
 
 class WallpaperAdapter(
-    private val wallpapers: List<String>
+    private val wallpapers: List<Wallpaper>
 ) : RecyclerView.Adapter<WallpaperAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -21,27 +21,23 @@ class WallpaperAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val imageUrl = wallpapers[position]
+        val item = wallpapers[position]
 
-        // 🔹 Carrega imagem no GRID
         Glide.with(holder.image.context)
-            .load(imageUrl)
+            .load(item.image_url)
             .centerCrop()
-            .placeholder(R.drawable.placeholder) // opcional
-            .error(R.drawable.placeholder_error) // opcional
             .into(holder.image)
 
-        // 🔹 Abre tela de preview
         holder.itemView.setOnClickListener {
-            val intent = Intent(holder.itemView.context, WallpaperActivity::class.java)
-            intent.putExtra("image_url", imageUrl)
-            holder.itemView.context.startActivity(intent)
+            val intent = Intent(it.context, WallpaperActivity::class.java)
+            intent.putExtra("image_url", item.image_url)
+            it.context.startActivity(intent)
         }
     }
 
-    override fun getItemCount(): Int = wallpapers.size
+    override fun getItemCount() = wallpapers.size
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val image: ImageView = itemView.findViewById(R.id.imgWallpaper)
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val image: ImageView = view.findViewById(R.id.imgWallpaper)
     }
 }
