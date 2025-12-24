@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.creative.piktura.R
 import com.creative.piktura.data.model.Wallpaper
-import com.creative.piktura.WallpaperActivity
+import com.creative.piktura.ui.preview.WallpaperActivity
 
 class WallpaperAdapter(
     private val context: Context,
