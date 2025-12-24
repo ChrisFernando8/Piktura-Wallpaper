@@ -6,6 +6,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.creative.piktura.R
 import com.creative.piktura.data.model.Wallpaper
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.json.JSONArray
+import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
 
@@ -14,20 +18,43 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
-
         recyclerView.layoutManager = GridLayoutManager(this, 2)
 
-        // 🔹 Lista vinda do Repository / JSON / API
-        val wallpapers = listOf(
-            Wallpaper(1, "Wallpaper 1", "https://SEU_DOMINIO.pages.dev/wallpapers/wp1.jpg"),
-            Wallpaper(2, "Wallpaper 2", "https://SEU_DOMINIO.pages.dev/wallpapers/wp2.jpg"),
-            Wallpaper(3, "Wallpaper 3", "https://SEU_DOMINIO.pages.dev/wallpapers/wp3.jpg")
-        )
+        fetchWallpapers { wallpapers ->
+            runOnUiThread {
+                recyclerView.adapter = WallpaperAdapter(
+                    context = this,
+                    images = wallpapers
+                )
+            }
+        }
+    }
 
-        // ✅ AQUI ESTAVA O ERRO
-        recyclerView.adapter = WallpaperAdapter(
-            context = this,
-            images = wallpapers
-        )
+    private fun fetchWallpapers(callback: (List<Wallpaper>) -> Unit) {
+        thread {
+            val client = OkHttpClient()
+            val request = Request.Builder()
+                .url("https://466f22d3.piktura-pages.pages.dev/wallpapers.json")
+                .build()
+
+            val response = client.newCall(request).execute()
+            val json = response.body?.string() ?: "[]"
+
+            val array = JSONArray(json)
+            val list = mutableListOf<Wallpaper>()
+
+            for (i in 0 until array.length()) {
+                val obj = array.getJSONObject(i)
+                list.add(
+                    Wallpaper(
+                        id = obj.getInt("id"),
+                        title = obj.getString("title"),
+                        image_url = obj.getString("image_url")
+                    )
+                )
+            }
+
+            callback(list)
+        }
     }
 }
