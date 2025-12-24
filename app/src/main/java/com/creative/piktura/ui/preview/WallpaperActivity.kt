@@ -4,6 +4,7 @@ import android.app.WallpaperManager
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
@@ -19,7 +20,7 @@ class WallpaperActivity : AppCompatActivity() {
     private lateinit var btnLock: Button
     private lateinit var btnBoth: Button
 
-    private var imageUrl: String? = null
+    private lateinit var imageUrl: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,16 +31,15 @@ class WallpaperActivity : AppCompatActivity() {
         btnLock = findViewById(R.id.btnLock)
         btnBoth = findViewById(R.id.btnBoth)
 
-        // 🔹 URL recebida do adapter
-        imageUrl = intent.getStringExtra("image_url")
+        imageUrl = intent.getStringExtra("image_url") ?: ""
 
-        if (imageUrl.isNullOrEmpty()) {
+        if (imageUrl.isEmpty()) {
             Toast.makeText(this, "Imagem inválida", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
-        // 🔹 Preview da imagem
+        // Preview seguro
         Glide.with(this)
             .load(imageUrl)
             .into(imageView)
@@ -47,34 +47,39 @@ class WallpaperActivity : AppCompatActivity() {
         btnHome.setOnClickListener { applyWallpaper(WallpaperManager.FLAG_SYSTEM) }
         btnLock.setOnClickListener { applyWallpaper(WallpaperManager.FLAG_LOCK) }
         btnBoth.setOnClickListener {
-            applyWallpaper(
-                WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK
-            )
+            applyWallpaper(WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK)
         }
     }
 
     private fun applyWallpaper(flag: Int) {
+
+        val metrics: DisplayMetrics = resources.displayMetrics
+        val targetWidth = metrics.widthPixels
+        val targetHeight = metrics.heightPixels
+
         Glide.with(this)
             .asBitmap()
             .load(imageUrl)
+            .override(targetWidth, targetHeight) // 🔥 EVITA OOM
+            .centerCrop()
             .into(object : CustomTarget<Bitmap>() {
 
                 override fun onResourceReady(
-                    resource: Bitmap,
+                    bitmap: Bitmap,
                     transition: Transition<in Bitmap>?
                 ) {
                     try {
-                        val wallpaperManager = WallpaperManager.getInstance(this@WallpaperActivity)
+                        val manager = WallpaperManager.getInstance(this@WallpaperActivity)
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            wallpaperManager.setBitmap(resource, null, true, flag)
+                            manager.setBitmap(bitmap, null, true, flag)
                         } else {
-                            wallpaperManager.setBitmap(resource)
+                            manager.setBitmap(bitmap)
                         }
 
                         Toast.makeText(
                             this@WallpaperActivity,
-                            "Wallpaper aplicado com sucesso!",
+                            "Wallpaper aplicado!",
                             Toast.LENGTH_SHORT
                         ).show()
 
