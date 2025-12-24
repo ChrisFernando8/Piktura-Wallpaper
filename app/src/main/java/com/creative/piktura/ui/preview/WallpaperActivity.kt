@@ -4,16 +4,16 @@ import android.app.WallpaperManager
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
-import android.util.DisplayMetrics
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.creative.piktura.R
-import kotlin.concurrent.thread
 
 class WallpaperActivity : AppCompatActivity() {
 
@@ -22,7 +22,7 @@ class WallpaperActivity : AppCompatActivity() {
     private lateinit var btnLock: Button
     private lateinit var btnBoth: Button
 
-    private var imageUrl: String? = null
+    private lateinit var imageUrl: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,92 +33,88 @@ class WallpaperActivity : AppCompatActivity() {
         btnLock = findViewById(R.id.btnLock)
         btnBoth = findViewById(R.id.btnBoth)
 
-        imageUrl = intent.getStringExtra("image_url")
+        // 🔒 URL obrigatória
+        val url = intent.getStringExtra("image_url")
 
-        if (imageUrl.isNullOrEmpty()) {
+        if (url.isNullOrBlank() || !url.startsWith("http")) {
             Toast.makeText(this, "Imagem inválida", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
-        // Preview seguro
+        imageUrl = url
+
+        // 🔹 Preview seguro
         Glide.with(this)
             .load(imageUrl)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
             .into(imageView)
 
-        btnHome.setOnClickListener { setWallpaperSafe(WallpaperManager.FLAG_SYSTEM) }
-        btnLock.setOnClickListener { setWallpaperSafe(WallpaperManager.FLAG_LOCK) }
+        btnHome.setOnClickListener {
+            applyWallpaper(WallpaperManager.FLAG_SYSTEM)
+        }
+
+        btnLock.setOnClickListener {
+            applyWallpaper(WallpaperManager.FLAG_LOCK)
+        }
+
         btnBoth.setOnClickListener {
-            setWallpaperSafe(
+            applyWallpaper(
                 WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK
             )
         }
     }
 
-    private fun setWallpaperSafe(flag: Int) {
-        thread {
-            try {
-                val manager = WallpaperManager.getInstance(this)
+    private fun applyWallpaper(flag: Int) {
 
-                Glide.with(this)
-                    .asBitmap()
-                    .load(imageUrl)
-                    .into(object : CustomTarget<Bitmap>() {
+        Toast.makeText(this, "Aplicando wallpaper...", Toast.LENGTH_SHORT).show()
 
-                        override fun onResourceReady(
-                            resource: Bitmap,
-                            transition: Transition<in Bitmap>?
-                        ) {
-                            try {
-                                val metrics = DisplayMetrics()
-                                windowManager.defaultDisplay.getMetrics(metrics)
+        Glide.with(this)
+            .asBitmap()
+            .load(imageUrl)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .into(object : CustomTarget<Bitmap>() {
 
-                                val scaledBitmap = Bitmap.createScaledBitmap(
-                                    resource,
-                                    metrics.widthPixels,
-                                    metrics.heightPixels,
-                                    true
-                                )
+                override fun onResourceReady(
+                    resource: Bitmap,
+                    transition: Transition<in Bitmap>?
+                ) {
+                    try {
+                        val manager = WallpaperManager.getInstance(this@WallpaperActivity)
 
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                    manager.setBitmap(scaledBitmap, null, true, flag)
-                                } else {
-                                    manager.setBitmap(scaledBitmap)
-                                }
-
-                                runOnUiThread {
-                                    Toast.makeText(
-                                        this@WallpaperActivity,
-                                        "Wallpaper aplicado!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                runOnUiThread {
-                                    Toast.makeText(
-                                        this@WallpaperActivity,
-                                        "Erro ao aplicar wallpaper",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            manager.setBitmap(resource, null, true, flag)
+                        } else {
+                            manager.setBitmap(resource)
                         }
 
-                        override fun onLoadCleared(placeholder: android.graphics.drawable.Drawable?) {}
-                    })
+                        Toast.makeText(
+                            this@WallpaperActivity,
+                            "Wallpaper aplicado com sucesso!",
+                            Toast.LENGTH_SHORT
+                        ).show()
 
-            } catch (e: Exception) {
-                e.printStackTrace()
-                runOnUiThread {
+                    } catch (e: Exception) {
+                        Log.e("Wallpaper", "Erro ao aplicar", e)
+                        Toast.makeText(
+                            this@WallpaperActivity,
+                            "Erro ao aplicar wallpaper",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+
+                override fun onLoadCleared(placeholder: android.graphics.drawable.Drawable?) {
+                    // Obrigatório — evita crash
+                }
+
+                override fun onLoadFailed(errorDrawable: android.graphics.drawable.Drawable?) {
                     Toast.makeText(
-                        this,
-                        "Erro inesperado",
+                        this@WallpaperActivity,
+                        "Falha ao carregar imagem",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
-            }
-        }
+            })
     }
 }
