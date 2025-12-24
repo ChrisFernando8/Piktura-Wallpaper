@@ -60,6 +60,8 @@ class WallpaperActivity : AppCompatActivity() {
     }
 
     private fun applyWallpaper(flag: Int) {
+        val manager = WallpaperManager.getInstance(this)
+
         Glide.with(this)
             .asBitmap()
             .load(imageUrl)
@@ -70,17 +72,15 @@ class WallpaperActivity : AppCompatActivity() {
                     transition: Transition<in Bitmap>?
                 ) {
                     try {
-                        val wallpaperManager = WallpaperManager.getInstance(this@WallpaperActivity)
-
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            wallpaperManager.setBitmap(resource, null, true, flag)
+                            manager.setBitmap(resource, null, true, flag)
                         } else {
-                            wallpaperManager.setBitmap(resource)
+                            manager.setBitmap(resource)
                         }
 
                         Toast.makeText(
                             this@WallpaperActivity,
-                            "Wallpaper aplicado com sucesso",
+                            "Wallpaper aplicado!",
                             Toast.LENGTH_SHORT
                         ).show()
 
@@ -95,7 +95,7 @@ class WallpaperActivity : AppCompatActivity() {
                 }
 
                 override fun onLoadCleared(placeholder: android.graphics.drawable.Drawable?) {
-                    // nada aqui
+                    // Obrigatório para evitar crash
                 }
             })
     }
