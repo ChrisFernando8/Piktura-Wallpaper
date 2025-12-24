@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
+import com.creative.piktura.R
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
