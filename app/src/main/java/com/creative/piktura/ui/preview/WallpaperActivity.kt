@@ -1,4 +1,4 @@
-package com.creative.piktura
+package com.creative.piktura.ui.preview
 
 import android.app.WallpaperManager
 import android.graphics.Bitmap
