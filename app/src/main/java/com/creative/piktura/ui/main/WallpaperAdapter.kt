@@ -21,21 +21,25 @@ class WallpaperAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val url = wallpapers[position]
+        val imageUrl = wallpapers[position]
 
+        // 🔹 Carrega imagem no GRID
         Glide.with(holder.image.context)
-            .load(url)
+            .load(imageUrl)
             .centerCrop()
+            .placeholder(R.drawable.placeholder) // opcional
+            .error(R.drawable.placeholder_error) // opcional
             .into(holder.image)
 
+        // 🔹 Abre tela de preview
         holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context, WallpaperActivity::class.java)
-            intent.putExtra("image_url", url)
+            intent.putExtra("image_url", imageUrl)
             holder.itemView.context.startActivity(intent)
         }
     }
 
-    override fun getItemCount() = wallpapers.size
+    override fun getItemCount(): Int = wallpapers.size
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val image: ImageView = itemView.findViewById(R.id.imgWallpaper)
