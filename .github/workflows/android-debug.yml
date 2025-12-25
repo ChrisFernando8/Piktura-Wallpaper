@@ -3,7 +3,7 @@ name: Build APK (Debug e Release)
 on:
   push:
     branches:
-      - co
+      - master
   workflow_dispatch:
 
 jobs:
