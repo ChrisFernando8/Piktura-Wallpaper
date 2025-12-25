@@ -3,43 +3,34 @@ package com.creative.piktura.ui.main
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.creative.piktura.data.model.Wallpaper
+import coil.load
 import com.creative.piktura.databinding.ItemWallpaperBinding
+import com.creative.piktura.data.model.Wallpaper
 
 class WallpaperAdapter(
-    private val onClick: (String) -> Unit
-) : RecyclerView.Adapter<WallpaperAdapter.VH>() {
+    private val items: List<Wallpaper>,
+    private val onClick: (Wallpaper) -> Unit
+) : RecyclerView.Adapter<WallpaperAdapter.ViewHolder>() {
 
-    private val items = mutableListOf<Wallpaper>()
+    inner class ViewHolder(val binding: ItemWallpaperBinding)
+        : RecyclerView.ViewHolder(binding.root)
 
-    fun submitList(list: List<Wallpaper>) {
-        items.clear()
-        items.addAll(list)
-        notifyDataSetChanged()
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemWallpaperBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
         )
-        return VH(binding)
+        return ViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: VH, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
 
-        Glide.with(holder.binding.root)
-            .load(item.imageUrl)
-            .centerCrop()
-            .into(holder.binding.imgWallpaper)
+        holder.binding.imgWallpaper.load(item.url)
 
         holder.binding.root.setOnClickListener {
-            onClick(item.imageUrl)
+            onClick(item)
         }
     }
 
     override fun getItemCount() = items.size
-
-    class VH(val binding: ItemWallpaperBinding) : RecyclerView.ViewHolder(binding.root)
 }
