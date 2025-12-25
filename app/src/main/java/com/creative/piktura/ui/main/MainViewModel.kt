@@ -1,10 +1,10 @@
 package com.creative.piktura.ui.main
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.creative.piktura.data.model.Wallpaper
 import com.creative.piktura.data.repository.WallpaperRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
 
@@ -14,9 +14,6 @@ class MainViewModel : ViewModel() {
     val wallpapers: LiveData<List<Wallpaper>> = _wallpapers
 
     fun loadWallpapers() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val result = repository.fetchWallpapers()
-            _wallpapers.postValue(result)
-        }
+        _wallpapers.value = repository.getWallpapers()
     }
 }
