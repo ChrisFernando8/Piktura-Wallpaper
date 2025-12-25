@@ -1,5 +1,5 @@
 package com.creative.piktura.data.model
 
 data class Wallpaper(
-    val imageUrl: String
+    val url: String
 )
