@@ -1,36 +1,45 @@
 package com.creative.piktura.ui.main
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
-import com.creative.piktura.R
+import com.bumptech.glide.Glide
 import com.creative.piktura.data.model.Wallpaper
-import kotlinx.android.synthetic.main.item_wallpaper.view.*
+import com.creative.piktura.databinding.ItemWallpaperBinding
 
 class WallpaperAdapter(
-    private val onClick: (Wallpaper) -> Unit
+    private val onClick: (String) -> Unit
 ) : RecyclerView.Adapter<WallpaperAdapter.VH>() {
 
     private val items = mutableListOf<Wallpaper>()
 
-    fun submit(list: List<Wallpaper>) {
+    fun submitList(list: List<Wallpaper>) {
         items.clear()
         items.addAll(list)
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(p: ViewGroup, v: Int): VH =
-        VH(LayoutInflater.from(p.context).inflate(R.layout.item_wallpaper, p, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
+        val binding = ItemWallpaperBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
+        return VH(binding)
+    }
 
-    override fun onBindViewHolder(h: VH, i: Int) {
-        val item = items[i]
-        h.itemView.imgWallpaper.load(item.image_url)
-        h.itemView.setOnClickListener { onClick(item) }
+    override fun onBindViewHolder(holder: VH, position: Int) {
+        val item = items[position]
+
+        Glide.with(holder.binding.root)
+            .load(item.imageUrl)
+            .centerCrop()
+            .into(holder.binding.imgWallpaper)
+
+        holder.binding.root.setOnClickListener {
+            onClick(item.imageUrl)
+        }
     }
 
     override fun getItemCount() = items.size
 
-    class VH(v: View) : RecyclerView.ViewHolder(v)
+    class VH(val binding: ItemWallpaperBinding) : RecyclerView.ViewHolder(binding.root)
 }
