@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'androidx.navigation.safeargs.kotlin'
 }
 
 android {
@@ -15,20 +16,10 @@ android {
         versionName "1.0"
     }
 
-    buildTypes {
-        release {
-            minifyEnabled false
-            shrinkResources false
-            proguardFiles getDefaultProguardFile(
-                'proguard-android-optimize.txt'
-            ), 'proguard-rules.pro'
-        }
-        debug {
-            debuggable true
-        }
+    buildFeatures {
+        viewBinding true
     }
 
-    // 🔥 ISSO RESOLVE O ERRO 1.8 x 17
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
@@ -37,15 +28,10 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
-
-    buildFeatures {
-        viewBinding true
-    }
 }
 
 dependencies {
 
-    // Core Android
     implementation "androidx.core:core-ktx:1.12.0"
     implementation "androidx.appcompat:appcompat:1.6.1"
     implementation "com.google.android.material:material:1.11.0"
@@ -53,13 +39,13 @@ dependencies {
     // RecyclerView
     implementation "androidx.recyclerview:recyclerview:1.3.2"
 
-    // Lifecycle (MVVM)
+    // Navigation
+    implementation "androidx.navigation:navigation-fragment-ktx:2.7.7"
+    implementation "androidx.navigation:navigation-ui-ktx:2.7.7"
+
+    // ViewModel
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.8.4"
 
-    // Coroutines
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
-
-    // Image loader (URL segura, melhor que Glide)
+    // Coil (imagens por URL)
     implementation "io.coil-kt:coil:2.6.0"
 }
