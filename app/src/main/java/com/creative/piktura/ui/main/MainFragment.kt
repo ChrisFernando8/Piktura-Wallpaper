@@ -30,27 +30,15 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupRecycler()
-        observeWallpapers()
-    }
-
-    private fun setupRecycler() {
-        adapter = WallpaperAdapter { wallpaper ->
+        adapter = WallpaperAdapter { imageUrl ->
             val action =
-                MainFragmentDirections.actionMainFragmentToPreviewFragment(
-                    wallpaper.url
-                )
-            androidx.navigation.fragment.findNavController(this)
-                .navigate(action)
+                MainFragmentDirections.actionMainFragmentToPreviewFragment(imageUrl)
+            androidx.navigation.fragment.findNavController(this).navigate(action)
         }
 
-        binding.recyclerView.apply {
-            layoutManager = GridLayoutManager(requireContext(), 2)
-            adapter = this@MainFragment.adapter
-        }
-    }
+        binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
+        binding.recyclerView.adapter = adapter
 
-    private fun observeWallpapers() {
         viewModel.wallpapers.observe(viewLifecycleOwner) { list ->
             adapter.submitList(list)
         }
