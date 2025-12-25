@@ -7,8 +7,7 @@ import java.net.URL
 class WallpaperRepository {
 
     private val DATA_URL =
-        "https://SEU_DOMINIO.pages.dev/wallpapers.json"
-
+        "https://466f22d3.piktura-pages.pages.dev.json"
     fun fetchWallpapers(): List<Wallpaper> {
         val json = URL(DATA_URL).readText()
         val array = JSONObject(json).getJSONArray("wallpapers")
